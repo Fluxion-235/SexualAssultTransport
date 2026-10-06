@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transit Sexual Harassment Risk - Mathematical Framework & Visualizer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1A365D;
+            --primary-accent: #2B6CB0;
+            --danger: #E53E3E;
+            --danger-dark: #9B2C2C;
+            --success: #38A169;
+            --warning: #DD6B20;
+            --bg: #F7FAFC;
+            --card-bg: #FFFFFF;
+            --border: #E2E8F0;
+            --text-dark: #2D3748;
+            --text-muted: #718096;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-dark);
+            line-height: 1.5;
+            padding: 24px;
+        }
+
+        header {
+            margin-bottom: 28px;
+            background: linear-gradient(135deg, #1A365D 0%, #2A4365 100%);
+            color: white;
+            padding: 28px 36px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: #E2E8F0;
+            max-width: 900px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 22px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .col-12 { grid-column: span 12; }
+        .col-6  { grid-column: span 6; }
+        .col-4  { grid-column: span 4; }
+        .col-8  { grid-column: span 8; }
+
+        @media (max-width: 1024px) {
+            .col-6, .col-4, .col-8 { grid-column: span 12; }
+        }
+
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+            border-left: 5px solid var(--primary-accent);
+        }
+
+        .kpi-card.danger { border-left-color: var(--danger); }
+        .kpi-card.warning { border-left-color: var(--warning); }
+        .kpi-card.success { border-left-color: var(--success); }
+
+        .kpi-label {
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin: 6px 0 2px 0;
+        }
+
+        .kpi-note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Interactive controls */
+        .control-group {
+            margin-bottom: 14px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider-wrapper input[type="range"] {
+            flex-grow: 1;
+        }
+
+        .slider-value {
+            font-weight: 700;
+            min-width: 70px;
+            font-size: 0.95rem;
+            color: var(--primary);
+        }
+
+        /* Heatmap table styling */
+        .heatmap-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        .heatmap-table th, .heatmap-table td {
+            padding: 10px 12px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .heatmap-table th {
+            background-color: #EDF2F7;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .heatmap-table td.route-name {
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-extreme { background-color: #FED7D7; color: #9B2C2C; }
+        .badge-severe  { background-color: #FEEBC8; color: #C05621; }
+        .badge-high    { background-color: #FEFCBF; color: #975A16; }
+        .badge-safe    { background-color: #C6F6D5; color: #22543D; }
+
+        .score-pill {
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Transit Sexual Harassment Risk & Econometric Modeling</h1>
+        <p>Mathematical utility formulations, CPTED environmental regression, regional reporting gaps, and route risk determinants across South Asian transit corridors.</p>
+    </header>
+
+    <!-- Top KPI cards -->
+    <div class="kpi-container">
+        <div class="kpi-card danger">
+            <div class="kpi-label">Sri Lanka Bus Lifetime Risk</div>
+            <div class="kpi-value">90.0% – 96.0%</div>
+            <div class="kpi-note">Peak on Colombo suburban buses</div>
+        </div>
+        <div class="kpi-card warning">
+            <div class="kpi-label">Victim Silence Rate</div>
+            <div class="kpi-value">92.0%</div>
+            <div class="kpi-note">Under 8% file formal police reports</div>
+        </div>
+        <div class="kpi-card danger">
+            <div class="kpi-label">Primary Risk Enabler</div>
+            <div class="kpi-value">70.3%</div>
+            <div class="kpi-note">Vehicular passenger overcrowding</div>
+        </div>
+        <div class="kpi-card success">
+            <div class="kpi-label">CPTED Mitigation Impact</div>
+            <div class="kpi-value">-65%</div>
+            <div class="kpi-note">Risk drop at MMC & Metrobus facilities</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- Interactive Model 1: Binary Logit Calculator -->
+        <div class="card col-6">
+            <div class="card-title">1. Binary Logit Vulnerability Calculator</div>
+            <div class="card-subtitle">Probability of experiencing transit harassment: P = 1 / (1 + e^-U)</div>
+            
+            <div class="control-group">
+                <label>Gender:</label>
+                <select id="logit-female" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
+                    <option value="1">Female (β = +3.703, t = 9.45)</option>
+                    <option value="0">Male (Reference category)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Employment & Student Status:</label>
+                <select id="logit-occup" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
+                    <option value="employed">Employed / Occupational Commuter (β = +1.064)</option>
+                    <option value="student">Student Commuter (β = +0.596)</option>
+                    <option value="none">Neither / Non-work traveler (Baseline)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Trip Purpose / Route Type:</label>
+                <select id="logit-trip" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
+                    <option value="1">Work Trip on Municipal Bus (β = +1.331)</option>
+                    <option value="0">General Off-Peak / Non-commute Trip (Baseline)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Spatial / Urban Setting:</label>
+                <select id="logit-loc" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
+                    <option value="other">Small Urban / Unmonitored (Baseline = 0.000)</option>
+                    <option value="rajshahi">Rajshahi Urban Transit (β = -0.285)</option>
+                    <option value="dhaka">Dhaka Megacity with CCTV (β = -0.450)</option>
+                </select>
+            </div>
+
+            <div style="background: #F7FAFC; padding: 18px; border-radius: 8px; border: 1px solid #CBD5E0; margin-top: 15px; text-align: center;">
+                <div style="font-size: 0.9rem; color: #4A5568; font-weight: 600;">Calculated Utility Disutility (U) & Harassment Probability (P)</div>
+                <div id="logit-prob" style="font-size: 2.2rem; font-weight: 800; color: #C53030; margin: 6px 0;">98.0%</div>
+                <div id="logit-u" style="font-size: 0.9rem; color: #718096; font-family: monospace;">U_risk = +3.898 | P_nh = 2.0%</div>
+            </div>
+        </div>
+
+        <!-- Interactive Model 2: Daily Incident Volume Simulator -->
+        <div class="card col-6">
+            <div class="card-title">2. Daily Harassment Incident Volume Model</div>
+            <div class="card-subtitle">N_incidents = V_daily × S_female × R_prevalence × C_density</div>
+
+            <div class="control-group">
+                <label>Daily Passenger Volume (V_daily):</label>
+                <div class="slider-wrapper">
+                    <input type="range" id="vol-slider" min="10000" max="200000" step="5000" value="85000" oninput="updateVolume()">
+                    <span class="slider-value" id="vol-val">85,000</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Female Passenger Share (S_female):</label>
+                <div class="slider-wrapper">
+                    <input type="range" id="fem-slider" min="20" max="80" step="5" value="50" oninput="updateVolume()">
+                    <span class="slider-value" id="fem-val">50%</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Prevalence Rate (R_prevalence):</label>
+                <div class="slider-wrapper">
+                    <input type="range" id="prev-slider" min="10" max="95" step="5" value="45" oninput="updateVolume()">
+                    <span class="slider-value" id="prev-val">45%</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Crowding Exposure Factor (C_density):</label>
+                <div class="slider-wrapper">
+                    <input type="range" id="crowd-slider" min="0.05" max="0.40" step="0.01" value="0.20" oninput="updateVolume()">
+                    <span class="slider-value" id="crowd-val">0.20</span>
+                </div>
+            </div>
+
+            <div style="background: #F7FAFC; padding: 18px; border-radius: 8px; border: 1px solid #CBD5E0; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center;">
+                <div>
+                    <div style="font-size: 0.75rem; text-transform: uppercase; color: #718096; font-weight: 700;">Daily Incidents</div>
+                    <div id="inc-daily" style="font-size: 1.5rem; font-weight: 800; color: #C53030;">~3,825</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.75rem; text-transform: uppercase; color: #718096; font-weight: 700;">Hourly Rate</div>
+                    <div id="inc-hourly" style="font-size: 1.5rem; font-weight: 800; color: #DD6B20;">212 / hr</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.75rem; text-transform: uppercase; color: #718096; font-weight: 700;">Minute Pace</div>
+                    <div id="inc-minute" style="font-size: 1.5rem; font-weight: 800; color: #2B6CB0;">3.5 / min</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Prevalence vs Reporting Gap Chart -->
+        <div class="card col-6">
+            <div class="card-title">3. Global Harassment Prevalence vs Reporting Gap</div>
+            <div class="card-subtitle">Massive reporting silence observed across all transit jurisdictions</div>
+            <div style="height: 340px;">
+                <canvas id="globalChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Ordered Probit Coping Behavior Chart -->
+        <div class="card col-6">
+            <div class="card-title">4. Ordered Probit Coping Mechanisms</div>
+            <div class="card-subtitle">Behavioral adjustments adopted by commuters (α_female: night = +1.081, walk = +0.619)</div>
+            <div style="height: 340px;">
+                <canvas id="copingChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Corridor Risk Determinant Matrix -->
+        <div class="card col-12">
+            <div class="card-title">5. Route & Mode Risk Determinant Matrix (Corridor Heatmap)</div>
+            <div class="card-subtitle">Assessment of Sri Lankan & South Asian transit corridors across key criminogenic and CPTED metrics</div>
+            <div style="overflow-x: auto;">
+                <table class="heatmap-table">
+                    <thead>
+                        <tr>
+                            <th>Corridor / Route</th>
+                            <th>Transit Mode</th>
+                            <th>Vehicular Overcrowding<br><small>(70.3% Primary Enabler)</small></th>
+                            <th>Station Darkness<br><small>(CPTED Infrastructure Deficit)</small></th>
+                            <th>Trip Duration<br><small>(Perpetrator Proximity)</small></th>
+                            <th>Absence of Staff<br><small>(Lack of Intervention)</small></th>
+                            <th>Perceived Impunity<br><small>(Low Apprehension Risk)</small></th>
+                            <th>Overall Risk Score<br><small>(1.0 - 10.0)</small></th>
+                            <th>Classification</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="route-name">Route 138 (Homagama ↔ Pettah)</td>
+                            <td>Municipal Bus</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">9.8</td>
+                            <td style="background-color: #FCE8E6; font-weight: bold;">8.5</td>
+                            <td style="background-color: #FCE8E6; font-weight: bold;">8.2</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">9.2</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">9.5</td>
+                            <td><span class="score-pill" style="background:#721C24; color:white;">9.5</span></td>
+                            <td><span class="badge badge-extreme">Extreme Modal Risk</span></td>
+                        </tr>
+                        <tr>
+                            <td class="route-name">Route 100 (Panadura ↔ Pettah)</td>
+                            <td>Coastal Bus</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">9.4</td>
+                            <td style="background-color: #FCE8E6; font-weight: bold;">8.1</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">8.6</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">8.8</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">9.1</td>
+                            <td><span class="score-pill" style="background:#900C3F; color:white;">9.0</span></td>
+                            <td><span class="badge badge-severe">Severe Risk</span></td>
+                        </tr>
+                        <tr>
+                            <td class="route-name">Kelani Valley (KV) Line</td>
+                            <td>Commuter Rail</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">9.5</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">9.2</td>
+                            <td style="background-color: #FFF3CD; font-weight: bold;">7.8</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">8.5</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">8.9</td>
+                            <td><span class="score-pill" style="background:#C0392B; color:white;">8.8</span></td>
+                            <td><span class="badge badge-severe">Severe Risk</span></td>
+                        </tr>
+                        <tr>
+                            <td class="route-name">Coastal Railway Line</td>
+                            <td>Commuter Rail</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">9.1</td>
+                            <td style="background-color: #FFF3CD; font-weight: bold;">7.9</td>
+                            <td style="background-color: #FCE8E6; font-weight: bold;">8.4</td>
+                            <td style="background-color: #FCE8E6; font-weight: bold;">8.2</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">8.6</td>
+                            <td><span class="score-pill" style="background:#D9534F; color:white;">8.5</span></td>
+                            <td><span class="badge badge-high">High Risk</span></td>
+                        </tr>
+                        <tr>
+                            <td class="route-name">Northern Railway (Colombo ↔ Jaffna)</td>
+                            <td>Intercity Rail</td>
+                            <td style="background-color: #FFF3CD; font-weight: bold;">6.0</td>
+                            <td style="background-color: #FFF3CD; font-weight: bold;">6.5</td>
+                            <td style="background-color: #F8D7DA; font-weight: bold;">9.5</td>
+                            <td style="background-color: #FFF3CD; font-weight: bold;">6.8</td>
+                            <td style="background-color: #FFF3CD; font-weight: bold;">7.4</td>
+                            <td><span class="score-pill" style="background:#E67E22; color:white;">7.2</span></td>
+                            <td><span class="badge badge-high">Duration-Driven Risk</span></td>
+                        </tr>
+                        <tr style="border-top: 3px solid #28A745;">
+                            <td class="route-name">Expressway CM01 Metrobus</td>
+                            <td>Expressway Bus</td>
+                            <td style="background-color: #D4EDDA; font-weight: bold;">3.2</td>
+                            <td style="background-color: #D4EDDA; font-weight: bold;">3.5</td>
+                            <td style="background-color: #E2E3E5; font-weight: bold;">4.5</td>
+                            <td style="background-color: #E2E3E5; font-weight: bold;">4.0</td>
+                            <td style="background-color: #D4EDDA; font-weight: bold;">3.8</td>
+                            <td><span class="score-pill" style="background:#28A745; color:white;">3.8</span></td>
+                            <td><span class="badge badge-safe">Mitigated Corridor</span></td>
+                        </tr>
+                        <tr>
+                            <td class="route-name">Makumbura Multimodal Centre (MMC)</td>
+                            <td>Integrated Hub</td>
+                            <td style="background-color: #D4EDDA; font-weight: bold;">3.5</td>
+                            <td style="background-color: #C3E6CB; font-weight: bold;">2.2</td>
+                            <td style="background-color: #C3E6CB; font-weight: bold;">2.8</td>
+                            <td style="background-color: #C3E6CB; font-weight: bold;">2.5</td>
+                            <td style="background-color: #C3E6CB; font-weight: bold;">2.9</td>
+                            <td><span class="score-pill" style="background:#1E8449; color:white;">3.2</span></td>
+                            <td><span class="badge badge-safe">Safe Engineered Hub</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logit Calculation
+        function updateLogit() {
+            const female = parseFloat(document.getElementById('logit-female').value);
+            const occup = document.getElementById('logit-occup').value;
+            const trip = parseFloat(document.getElementById('logit-trip').value);
+            const loc = document.getElementById('logit-loc').value;
+
+            let employed = occup === 'employed' ? 1 : 0;
+            let student = occup === 'student' ? 1 : 0;
+
+            let locEffect = 0.0;
+            if (loc === 'dhaka') locEffect = -0.450;
+            if (loc === 'rajshahi') locEffect = -0.285;
+
+            const beta0 = -2.2;
+            const u = beta0 + (3.703 * female) + (1.064 * employed) + (0.596 * student) + (1.331 * trip) + locEffect;
+            const prob = 1.0 / (1.0 + Math.exp(-u));
+
+            document.getElementById('logit-prob').innerText = (prob * 100).toFixed(1) + '%';
+            document.getElementById('logit-u').innerText = `U_risk = ${u >= 0 ? '+' : ''}${u.toFixed(3)} | P_unharassed = ${((1-prob)*100).toFixed(1)}%`;
+        }
+
+        // Daily Volume Calculation
+        function updateVolume() {
+            const v = parseFloat(document.getElementById('vol-slider').value);
+            const s = parseFloat(document.getElementById('fem-slider').value) / 100;
+            const r = parseFloat(document.getElementById('prev-slider').value) / 100;
+            const c = parseFloat(document.getElementById('crowd-slider').value);
+
+            document.getElementById('vol-val').innerText = v.toLocaleString();
+            document.getElementById('fem-val').innerText = (s * 100).toFixed(0) + '%';
+            document.getElementById('prev-val').innerText = (r * 100).toFixed(0) + '%';
+            document.getElementById('crowd-val').innerText = c.toFixed(2);
+
+            const daily = Math.round(v * s * r * c);
+            const hourly = Math.round(daily / 18);
+            const perMin = (daily / (18 * 60)).toFixed(1);
+
+            document.getElementById('inc-daily').innerText = '~' + daily.toLocaleString();
+            document.getElementById('inc-hourly').innerText = hourly.toLocaleString() + ' / hr';
+            document.getElementById('inc-minute').innerText = perMin + ' / min';
+        }
+
+        // Initialize Charts
+        window.addEventListener('load', () => {
+            // Global Prevalence Chart
+            const ctxGlobal = document.getElementById('globalChart').getContext('2d');
+            new Chart(ctxGlobal, {
+                type: 'bar',
+                data: {
+                    labels: ['Sri Lanka', 'France', 'Chile', 'Colombia', 'Egypt', 'Nepal', 'Pakistan', 'Bangladesh'],
+                    datasets: [
+                        {
+                            label: 'Lifetime Harassment (%)',
+                            data: [90.0, 87.0, 85.0, 84.0, 83.0, 82.1, 78.0, 70.0],
+                            backgroundColor: '#E53E3E'
+                        },
+                        {
+                            label: 'Formal Police Reporting (%)',
+                            data: [8.0, 10.0, 7.0, 11.0, 2.0, 3.7, 5.0, 6.0],
+                            backgroundColor: '#319795'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 100,
+                            ticks: { callback: v => v + '%' }
+                        }
+                    }
+                }
+            });
+
+            // Coping Behavior Chart
+            const ctxCoping = document.getElementById('copingChart').getContext('2d');
+            new Chart(ctxCoping, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        'Avoid Night Travel (Female)',
+                        'Avoid Night Travel (Male)',
+                        'Avoid Walking Alone (Female)',
+                        'Avoid Walking Alone (Male)'
+                    ],
+                    datasets: [
+                        { label: 'Never', data: [5.2, 30.8, 12.8, 30.8], backgroundColor: '#48BB78' },
+                        { label: 'Rarely', data: [15.8, 31.1, 24.3, 31.1], backgroundColor: '#9AE6B4' },
+                        { label: 'Sometimes', data: [29.6, 24.1, 31.2, 24.1], backgroundColor: '#FAF089' },
+                        { label: 'Frequently', data: [28.8, 10.4, 21.1, 10.4], backgroundColor: '#ED8936' },
+                        { label: 'Always', data: [20.6, 3.6, 10.6, 3.6], backgroundColor: '#E53E3E' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            stacked: true,
+                            min: 0,
+                            max: 100,
+                            ticks: { callback: v => v + '%' }
+                        },
+                        y: { stacked: true }
+                    }
+                }
+            });
+
+            updateLogit();
+            updateVolume();
+        });
+    </script>
+</body>
+</html>
