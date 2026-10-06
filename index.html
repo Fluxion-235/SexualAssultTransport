@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Western Province Transit Network: Risk Simulation & Capacity Assessment</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #1A365D;
@@ -565,6 +568,203 @@
         .tab-section.active {
             display: block;
         }
+
+        /* ================================================================
+           THEME LAYER — "The Silent Commute"
+           Sober aubergine + crimson palette to match the gravity of the subject
+           ================================================================ */
+        :root {
+            --primary: #2D1B3D;
+            --primary-accent: #7B2D5B;
+            --danger: #C0263D;
+            --danger-dark: #8A1C2E;
+            --danger-bg: #FDF2F4;
+            --success: #2F7D6D;
+            --warning: #C76B1E;
+            --bg: #F6F3F1;
+            --card-bg: #FFFFFF;
+            --border: #E7E0DC;
+            --text-dark: #231A24;
+            --text-muted: #6E6470;
+            --pulse-red: rgba(192, 38, 61, 0.35);
+            --ink: #1B1220;
+        }
+
+        * { font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+        body {
+            background:
+                radial-gradient(1200px 500px at 100% -10%, rgba(123, 45, 91, 0.07), transparent 60%),
+                radial-gradient(900px 400px at -10% 0%, rgba(192, 38, 61, 0.05), transparent 60%),
+                var(--bg);
+            padding: 28px clamp(14px, 3vw, 40px);
+            max-width: 1680px;
+            margin: 0 auto;
+        }
+
+        header {
+            background:
+                linear-gradient(120deg, rgba(27, 18, 32, 0.96) 0%, rgba(45, 27, 61, 0.95) 55%, rgba(123, 45, 91, 0.92) 100%);
+            border-radius: 18px;
+            padding: 34px 40px;
+            box-shadow: 0 18px 40px -18px rgba(27, 18, 32, 0.55);
+            position: relative;
+            overflow: hidden;
+        }
+        header::after {
+            content: "";
+            position: absolute; inset: auto -60px -80px auto;
+            width: 320px; height: 320px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(192, 38, 61, 0.35), transparent 70%);
+            pointer-events: none;
+        }
+        .header-eyebrow {
+            font-size: 0.72rem; letter-spacing: 2.4px; text-transform: uppercase;
+            color: #E9B8C8; font-weight: 700; margin-bottom: 10px;
+        }
+        header .header-left h1 {
+            font-family: "Fraunces", Georgia, serif;
+            font-size: clamp(1.6rem, 3vw, 2.45rem);
+            font-weight: 800; line-height: 1.15; letter-spacing: -0.5px;
+        }
+        header .header-left h1 em { font-style: normal; color: #F4A3B5; }
+        header .header-left p { color: #D9CFDD; font-size: 0.98rem; margin-top: 8px; }
+        .header-live-badge { position: relative; z-index: 1; border-radius: 12px; }
+
+        /* Mission statement banner */
+        .mission-banner {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 22px;
+            align-items: center;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px 26px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 18px -10px rgba(45, 27, 61, 0.25);
+        }
+        .mission-stat {
+            font-family: "Fraunces", Georgia, serif;
+            font-size: 3rem; font-weight: 800; line-height: 1;
+            color: var(--danger);
+        }
+        .mission-text { font-size: 0.98rem; color: var(--text-dark); line-height: 1.55; }
+        .mission-text strong { color: var(--primary-accent); }
+        .mission-cta {
+            font-size: 0.8rem; font-weight: 700; color: var(--primary);
+            background: #F3E8EE; border: 1px solid #E4CCD8;
+            padding: 10px 14px; border-radius: 10px; white-space: nowrap; text-align: center;
+        }
+        .mission-cta b { display: block; font-size: 1.15rem; color: var(--danger-dark); }
+        @media (max-width: 860px) { .mission-banner { grid-template-columns: 1fr; text-align: left; } }
+
+        /* Tabs as pill segmented control */
+        .nav-tabs {
+            border-bottom: none;
+            background: #EDE6E3;
+            padding: 6px;
+            border-radius: 14px;
+            gap: 4px;
+        }
+        .nav-tab-btn { font-weight: 600; font-size: 0.9rem; border-radius: 10px; color: #5B4F5D; }
+        .nav-tab-btn:hover { background: rgba(255,255,255,0.7); color: var(--primary); }
+        .nav-tab-btn.active {
+            background: var(--card-bg); color: var(--primary);
+            box-shadow: 0 2px 10px -2px rgba(45, 27, 61, 0.25);
+        }
+
+        /* Cards */
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 4px 18px -12px rgba(45, 27, 61, 0.28);
+            padding: 24px;
+        }
+        .card-title { font-weight: 700; color: var(--ink); letter-spacing: -0.2px; }
+
+        /* KPI cards */
+        .kpi-container { grid-template-columns: repeat(5, 1fr); gap: 14px; }
+        @media (max-width: 1200px) { .kpi-container { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 700px)  { .kpi-container { grid-template-columns: repeat(2, 1fr); } }
+        .kpi-card {
+            border-left: none;
+            border-top: 4px solid var(--primary-accent);
+            border-radius: 14px;
+            padding: 16px 18px 14px;
+            box-shadow: 0 4px 16px -12px rgba(45, 27, 61, 0.35);
+            position: relative;
+        }
+        .kpi-card.danger  { border-top-color: var(--danger); }
+        .kpi-card.warning { border-top-color: var(--warning); }
+        .kpi-card.success { border-top-color: var(--success); }
+        .kpi-card.expected { border-top-color: var(--primary); background: linear-gradient(180deg, #FBF7FA, #FFFFFF); }
+        .kpi-label { font-size: 0.7rem; letter-spacing: 1px; color: #7A6E7C; }
+        .kpi-value {
+            font-family: "Fraunces", Georgia, serif;
+            font-size: 2.1rem; font-weight: 800; color: var(--ink);
+        }
+        .kpi-progress {
+            height: 6px; background: #EFE7EB; border-radius: 99px; overflow: hidden; margin: 8px 0 4px;
+        }
+        .kpi-progress > span {
+            display: block; height: 100%; width: 0%;
+            background: linear-gradient(90deg, var(--primary-accent), var(--danger));
+            transition: width 0.8s ease;
+        }
+
+        /* Clock / control bar */
+        .sim-control-panel {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 4px 18px -12px rgba(45, 27, 61, 0.3);
+        }
+        .clock-digital {
+            font-family: "JetBrains Mono", monospace;
+            background: var(--ink);
+            color: #F4A3B5;
+            border-radius: 10px;
+        }
+        .clock-period-tag { background: #F1EAEE; color: var(--primary); border-radius: 8px; }
+        .clock-period-tag.peak { background: var(--danger-bg); color: var(--danger-dark); border-color: #F2C2CB; }
+
+        /* Incident feed */
+        .incident-feed-container { max-height: 620px; }
+        .incident-item { border-radius: 12px; border-left-width: 4px; padding: 14px 16px; }
+        .incident-item.unreported { border-left-color: var(--danger); }
+        .incident-item.reported { border-left-color: #5B5BD6; background: #F4F4FE; }
+        .incident-item.mitigated { border-left-color: var(--success); background: #F1FAF7; }
+        .incident-nature { color: var(--danger-dark); }
+        .incident-route-badge { background: #F1EAEE; color: var(--primary); }
+        .incident-cause { background: #FBF5F0; border-left-color: var(--warning); color: #7A3E12; }
+
+        /* Corridor radar */
+        .corridor-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+        .corridor-card { background: #FCFAF9; border-radius: 12px; }
+        .corridor-card.corridor-alert { background: var(--danger-bg); border-color: var(--danger); box-shadow: 0 0 0 3px rgba(192,38,61,0.15); }
+        .corridor-name { color: var(--ink); }
+        .corridor-bar { height: 4px; background: #EFE7EB; border-radius: 99px; margin-top: 8px; overflow: hidden; }
+        .corridor-bar > span { display: block; height: 100%; background: var(--danger); }
+
+        .custom-table th { background: #F3EDEF; color: var(--ink); }
+        .badge-extreme { background-color: #FBE1E6; color: var(--danger-dark); }
+
+        /* Support footer */
+        .support-footer {
+            margin-top: 10px;
+            background: var(--ink);
+            color: #E6DCE8;
+            border-radius: 16px;
+            padding: 22px 28px;
+            display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: space-between;
+            font-size: 0.88rem;
+        }
+        .support-footer .lines { display: flex; flex-wrap: wrap; gap: 12px; }
+        .support-footer .line {
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14);
+            padding: 8px 14px; border-radius: 10px;
+        }
+        .support-footer .line b { color: #F4A3B5; font-family: "JetBrains Mono", monospace; font-size: 1.05rem; margin-right: 6px; }
+        .support-footer small { color: #A99BAD; display: block; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -572,48 +772,66 @@
     <!-- Header -->
     <header>
         <div class="header-left">
-            <h1>Western Province Transit Network: Risk Simulation & Capacity Analysis</h1>
-            <p>Discrete choice mathematical models, real-time incident tick engine, corridor operational deficits, and regulatory oversight across Sri Lanka's commuter network.</p>
+            <div class="header-eyebrow">Western Province, Sri Lanka · Live Transit Safety Observatory</div>
+            <h1>The Silent Commute: <em>9 in 10 women</em> are harassed on public transport.<br>Almost none report it.</h1>
+            <p>A real-time model of sexual harassment across Colombo's bus and rail corridors — driven by the live Colombo clock, live weather, and empirical ADB / UNFPA prevalence data.</p>
         </div>
         <div class="header-live-badge">
             <div class="live-dot" id="live-dot-indicator"></div>
             <div>
-                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px; color: #CBD5E0;">Tick Engine Status</div>
-                <div style="font-size: 0.95rem; font-weight: 800;" id="live-status-text">SIMULATOR ACTIVE</div>
+                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px; color: #CBD5E0;">Model Status</div>
+                <div style="font-size: 0.95rem; font-weight: 800;" id="live-status-text">LIVE · ASIA/COLOMBO</div>
             </div>
         </div>
     </header>
 
-    <!-- Navigation Tabs -->
-    <div class="nav-tabs">
-        <button class="nav-tab-btn active" onclick="switchTab('tab-simulator')">⏱️ Live Incident Telemetry & Radar</button>
-        <button class="nav-tab-btn" onclick="switchTab('tab-routes-tariffs')">🚍 Route Corridors, Tariffs & Risk Profiles</button>
-        <button class="nav-tab-btn" onclick="switchTab('tab-corridors')">🗺️ Corridor Risk Heatmap & Reporting Gap</button>
-        <button class="nav-tab-btn" onclick="switchTab('tab-operations')">📊 Systemic Capacity & Operational Deficits</button>
-        <button class="nav-tab-btn" onclick="switchTab('tab-models')">📐 Econometric Models & Demographics</button>
+    <!-- Mission banner -->
+    <div class="mission-banner">
+        <div class="mission-stat">96%</div>
+        <div class="mission-text">
+            of victims on Sri Lankan suburban buses <strong>never report</strong> what happened to them (UNFPA).
+            Overcrowding, dark bus halts and crew indifference let offenders act with near-total impunity.
+            Every entry in the feed below represents an <strong>estimated</strong> incident occurring right now, somewhere on these routes.
+        </div>
+        <div class="mission-cta">If you need help<b>119 · 1938</b>Police · Women's Helpline</div>
     </div>
 
-    <!-- Top KPI cards (Dynamic from Simulation) -->
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab-btn active" onclick="switchTab('tab-simulator', this)">Live Incident Feed</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-routes-tariffs', this)">Routes, Tariffs &amp; Risk</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-corridors', this)">Risk Heatmap &amp; Reporting Gap</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-operations', this)">Capacity &amp; Deficits</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-models', this)">Econometric Models</button>
+    </div>
+
+    <!-- Top KPI cards (time-derived expected totals + live accumulation) -->
     <div class="kpi-container">
-        <div class="kpi-card danger">
-            <div class="kpi-label">Simulated Incidents Today</div>
+        <div class="kpi-card expected">
+            <div class="kpi-label">Estimated Incidents Today</div>
             <div class="kpi-value" id="kpi-incidents-total">0</div>
-            <div class="kpi-note" id="kpi-rate-sub">Rate: ~3.5 per minute (211/hr)</div>
+            <div class="kpi-progress"><span id="kpi-day-progress"></span></div>
+            <div class="kpi-note" id="kpi-rate-sub">Calculating from midnight (Asia/Colombo)…</div>
         </div>
         <div class="kpi-card warning">
-            <div class="kpi-label">Suffer in Silence (96%)</div>
+            <div class="kpi-label">Suffered in Silence</div>
             <div class="kpi-value" id="kpi-unreported">0</div>
-            <div class="kpi-note">Victims unassisted / silent (92-96%)</div>
+            <div class="kpi-note">Never reported (≈96%)</div>
         </div>
         <div class="kpi-card danger">
-            <div class="kpi-label">Overcrowding Triggered (70.3%)</div>
+            <div class="kpi-label">Enabled by Overcrowding</div>
             <div class="kpi-value" id="kpi-crowding">0</div>
-            <div class="kpi-note">Crush-load standing enabler</div>
+            <div class="kpi-note">Crush-load standing contact</div>
         </div>
         <div class="kpi-card success">
-            <div class="kpi-label">Police Reports Lodged (4%)</div>
+            <div class="kpi-label">Reported to Police</div>
             <div class="kpi-value" id="kpi-reported">0</div>
-            <div class="kpi-note">Formal legal action initiated</div>
+            <div class="kpi-note">Formal complaints (≈4%)</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Projected by Midnight</div>
+            <div class="kpi-value" id="kpi-projected">0</div>
+            <div class="kpi-note" id="kpi-projected-note">Full-day model total</div>
         </div>
     </div>
 
@@ -685,6 +903,58 @@
                 <button class="sim-btn" id="btn-audio-toggle" style="background:#EDF2F7; color:#2D3748; padding:7px 12px;" onclick="toggleAudio()">
                     🔊 Sound: ON
                 </button>
+            </div>
+        </div>
+
+        <!-- Render Free-Tier Cold-Boot Math Integration & Resiliency Card -->
+        <div class="card" style="margin-bottom: 20px; border-left: 6px solid var(--primary-accent); background: linear-gradient(135deg, #FAF7F9 0%, #FFFFFF 100%);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 10px;">
+                <div>
+                    <div style="font-size: 0.72rem; letter-spacing: 1.4px; text-transform: uppercase; color: var(--primary-accent); font-weight: 800;">
+                        Render Free Plan Cold-Boot Architecture &middot; Deterministic State Recovery
+                    </div>
+                    <div style="font-family: 'Fraunces', Georgia, serif; font-size: 1.28rem; font-weight: 800; color: var(--ink); margin-top: 2px;">
+                        Continuous Time-Elapsed Incident Calculus: <em>E(t) = &int;<sub>0</sub><sup>t</sup> &lambda;(s) ds</em>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <span style="font-size: 0.78rem; font-weight: 700; background: #EBF8FF; color: #2B6CB0; border: 1px solid #BEE3F8; padding: 4px 10px; border-radius: 6px;" id="calc-badge-clock">
+                        SLST: --:--:--
+                    </span>
+                    <span style="font-size: 0.78rem; font-weight: 700; background: #FDF2F4; color: var(--danger-dark); border: 1px solid #FEB2B2; padding: 4px 10px; border-radius: 6px;" id="calc-badge-rate">
+                        Rate: ~0 / hr
+                    </span>
+                    <span style="font-size: 0.78rem; font-weight: 700; background: #F0FFF4; color: var(--success); border: 1px solid #C6F6D5; padding: 4px 10px; border-radius: 6px;" id="calc-wx-status">
+                        Open-Meteo Hourly Synced
+                    </span>
+                </div>
+            </div>
+
+            <p style="font-size: 0.88rem; color: var(--text-dark); line-height: 1.55; margin-bottom: 14px;">
+                Because free-tier hosting platforms like Render put idle web containers to sleep after 15 minutes of inactivity, naive in-memory counters would reset today's incidents to zero on each cold boot. To maintain absolute statistical truth, this observatory deterministically derives cumulative daily figures from the Sri Lanka Standard Time (<span style="font-family:'JetBrains Mono', monospace; font-size:0.82rem;">Asia/Colombo, UTC+05:30</span>) clock. At any second of the day, the integral reconstructs the exact cumulative incident volume since midnight (<span style="font-family:'JetBrains Mono', monospace; font-size:0.82rem;">00:00:00</span>) using empirical diurnal rush-hour curves, live Open-Meteo temperature/humidity stress, rain factors, and post-dusk CPTED darkness.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; font-size: 0.82rem; background: #FFFFFF; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px;">
+                <div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Base Baseline</div>
+                    <div style="font-weight: 800; color: var(--ink); font-size: 0.95rem;">3,825 incidents / 24h</div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem;">ADB &amp; UNFPA Empirical Level</div>
+                </div>
+                <div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Calibration Constant</div>
+                    <div style="font-weight: 800; color: var(--ink); font-size: 0.95rem; font-family: 'JetBrains Mono', monospace;">K &asymp; 0.0406 / sec</div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem;">&int;&sub0;&sup8;&sup6;&sup4;&sup0;&sup0; &lambda;(s) ds &equiv; 3,825</div>
+                </div>
+                <div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Day Elapsed Cycle</div>
+                    <div style="font-weight: 800; color: var(--primary-accent); font-size: 0.95rem;" id="calc-day-elapsed">0.0%</div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem;" id="calc-day-secs">0 of 86,400s</div>
+                </div>
+                <div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Cold-Boot Recovery</div>
+                    <div style="font-weight: 800; color: var(--success); font-size: 0.95rem;">&check; Zero Volatile State Loss</div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem;">Instant mathematical reconstruction</div>
+                </div>
             </div>
         </div>
 
@@ -1601,17 +1871,36 @@
         </div>
     </div>
 
+    <!-- Support & methodology footer -->
+    <footer class="support-footer">
+        <div>
+            <strong style="color:#fff; font-size:1rem;">You are not alone. Harassment is a crime under Penal Code §345.</strong>
+            <small>Figures are model estimates derived from ADB, UNFPA and NTC data — not police records. Counts are recomputed from the Colombo clock on every visit.</small>
+        </div>
+        <div class="lines">
+            <div class="line"><b>119</b>Police Emergency</div>
+            <div class="line"><b>1938</b>Women's Helpline</div>
+            <div class="line"><b>1929</b>Child Protection</div>
+        </div>
+    </footer>
+
     <!-- ========================================================================= -->
     <!-- SIMULATOR ENGINE JAVASCRIPT LOGIC                                         -->
     <!-- ========================================================================= -->
     <script>
         // Tab switching
-        function switchTab(tabId) {
+        function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
             
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
+            const target = document.getElementById(tabId);
+            if (target) target.classList.add('active');
+            if (btn && btn.classList) {
+                btn.classList.add('active');
+            } else if (typeof event !== 'undefined' && event && event.target) {
+                const b = event.target.closest('.nav-tab-btn') || event.target;
+                if (b && b.classList) b.classList.add('active');
+            }
         }
 
         // --- SIMULATOR STATE ---
@@ -1825,7 +2114,7 @@
 
         // Fetch Live Colombo Weather from Open-Meteo API
         async function fetchLiveColomboWeather() {
-            const url = "https://api.open-meteo.com/v1/forecast?latitude=6.9271&longitude=79.8612&current=temperature_2m,relative_humidity_2m,precipitation,rain,weather_code,cloud_cover,wind_speed_10m&timezone=Asia%2FColombo";
+            const url = "https://api.open-meteo.com/v1/forecast?latitude=6.9271&longitude=79.8612&current=temperature_2m,relative_humidity_2m,precipitation,rain,weather_code,cloud_cover,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,precipitation&forecast_days=1&timezone=Asia%2FColombo";
             const badge = document.getElementById('live-internet-badge');
             try {
                 if (badge) badge.style.background = '#DD6B20';
@@ -1840,14 +2129,27 @@
                 SIM_STATE.weather.wind = cur.wind_speed_10m;
                 SIM_STATE.weather.lastUpdated = new Date();
 
+                // Today's hourly record (00:00–23:00 local) — used to backfill the expected count
+                if (data.hourly && Array.isArray(data.hourly.temperature_2m)) {
+                    SIM_STATE.hourlyWx = data.hourly.temperature_2m.map((t, i) => ({
+                        temp: t,
+                        humidity: data.hourly.relative_humidity_2m[i],
+                        precip: data.hourly.precipitation[i]
+                    }));
+                }
+
                 if (badge) badge.style.background = '#38A169';
                 const stLabel = document.getElementById('live-station-label');
                 if (stLabel) stLabel.innerText = `Open-Meteo Live (${cur.time} Colombo)`;
                 updateWeatherUI();
+                seedFromExpectedCount();
+                seedRecentIncidentStream(5);
             } catch (err) {
                 console.warn("Live weather fetch error:", err);
                 if (badge) badge.style.background = '#3182CE';
                 updateWeatherUI();
+                seedFromExpectedCount();
+                seedRecentIncidentStream(5);
             }
         }
 
@@ -2012,11 +2314,141 @@
         // Get Diurnal Rush Hour Factor
         function getDiurnalFactor(sec) {
             const h = sec / 3600;
+            if (h < 5.0 || h >= 23.0) return { factor: 0.25, label: "OVERNIGHT (Minimal Service)", isPeak: false };
             if (h >= 7.0 && h <= 9.5) return { factor: 2.2, label: "MORNING PEAK RUSH (2.2x Surge)", isPeak: true };
             if (h >= 16.5 && h <= 19.5) return { factor: 2.0, label: "EVENING COMMUTE SURGE (2.0x Peak)", isPeak: true };
             if (h >= 11.5 && h <= 14.0) return { factor: 1.15, label: "MIDDAY SCHOOL & OFFICE SHIFT (1.15x)", isPeak: false };
             if (h >= 20.0) return { factor: 0.8, label: "NIGHT COMMUTE (0.8x / CPTED Deficit)", isPeak: false };
             return { factor: 0.7, label: "OFF-PEAK TRANSIT (0.7x)", isPeak: false };
+        }
+
+        // =====================================================================
+        // TIME-DERIVED EXPECTED COUNT MODEL
+        // ---------------------------------------------------------------------
+        // Render's free tier sleeps the server when idle and every page load
+        // starts fresh, so counts are never stored. Instead the "incidents so
+        // far today" figure is computed deterministically from the Colombo clock:
+        //
+        //     E(t) = ∫₀ᵗ λ(s) ds,   λ(s) = K · diurnal(s) · heat(s) · rain(s) · cpted(s)
+        //
+        // K is calibrated so a neutral-weather day integrates to the ADB
+        // benchmark of ~3,825 incidents. Past hours use today's actual hourly
+        // Open-Meteo weather; the live feed then continues at the same λ(t).
+        // =====================================================================
+        const DAILY_BENCHMARK = 3825;
+        const STEP_SEC = 60;
+        const NEUTRAL_WX = { temp: 28.0, humidity: 55, precip: 0 };
+
+        function weatherFactorAt(sec, wx) {
+            const h = sec / 3600;
+            const heat = (wx.temp >= 30.0 && wx.humidity >= 60) ? 1.15 : 1.0;
+            const rain = (wx.precip > 0) ? 1.55 : 1.0;
+            const cpted = (h >= 18.25 || h < 5.75) ? 1.40 : 1.0;
+            return heat * rain * cpted;
+        }
+
+        function wxForSecond(sec) {
+            const hr = Math.min(23, Math.floor(sec / 3600));
+            return (SIM_STATE.hourlyWx && SIM_STATE.hourlyWx[hr]) ? SIM_STATE.hourlyWx[hr] : NEUTRAL_WX;
+        }
+
+        // Calibrate K (incidents per second per unit factor) once
+        const RATE_K = (() => {
+            let integral = 0;
+            for (let s = 0; s < 86400; s += STEP_SEC) {
+                integral += getDiurnalFactor(s).factor * weatherFactorAt(s, NEUTRAL_WX) * STEP_SEC;
+            }
+            return DAILY_BENCHMARK / integral;
+        })();
+
+        function rateAt(sec) {
+            return RATE_K * getDiurnalFactor(sec).factor * weatherFactorAt(sec, wxForSecond(sec));
+        }
+
+        // Expected incidents between two clock-seconds of today (midpoint rule)
+        function expectedBetween(fromSec, toSec) {
+            let total = 0;
+            for (let s = fromSec; s < toSec; s += STEP_SEC) {
+                const dt = Math.min(STEP_SEC, toSec - s);
+                total += rateAt(s + dt / 2) * dt;
+            }
+            return total;
+        }
+
+        function colomboSecondsNow() {
+            const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Colombo" }));
+            return now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+        }
+
+        // Overwrite counters with the deterministic expected values for "now"
+        function seedFromExpectedCount() {
+            const nowSec = colomboSecondsNow();
+            const expected = expectedBetween(0, nowSec);
+            const total = Math.round(expected);
+            const crowdShare = 0.703; // ADB empirical benchmark: 70.3% overcrowding enabled
+
+            SIM_STATE.totalIncidentsToday = total;
+            SIM_STATE.reportedCount = Math.round(total * 0.04);
+            SIM_STATE.unreportedCount = total - SIM_STATE.reportedCount;
+            SIM_STATE.crowdingCount = Math.round(total * crowdShare);
+            SIM_STATE.lastClockSec = nowSec;
+            tickAccumulator = expected - total + 0.5; // carry the fractional remainder into the live feed
+
+            // Distribute across corridors by risk weight (largest-remainder rounding)
+            const raw = CORRIDORS.map(c => total * c.riskWeight);
+            const floors = raw.map(Math.floor);
+            let leftover = total - floors.reduce((a, b) => a + b, 0);
+            raw.map((v, i) => [v - floors[i], i]).sort((a, b) => b[0] - a[0])
+               .forEach(([, i]) => { if (leftover > 0) { floors[i]++; leftover--; } });
+            CORRIDORS.forEach((c, i) => { c.currentHits = floors[i]; });
+
+            renderCounters();
+            updateExpectedUI();
+        }
+
+        function renderCounters() {
+            document.getElementById('kpi-incidents-total').innerText = SIM_STATE.totalIncidentsToday.toLocaleString();
+            document.getElementById('kpi-unreported').innerText = SIM_STATE.unreportedCount.toLocaleString();
+            document.getElementById('kpi-crowding').innerText = SIM_STATE.crowdingCount.toLocaleString();
+            document.getElementById('kpi-reported').innerText = SIM_STATE.reportedCount.toLocaleString();
+            const maxHits = Math.max(1, ...CORRIDORS.map(c => c.currentHits));
+            CORRIDORS.forEach(c => {
+                const hitsEl = document.getElementById(`hits-${c.id}`);
+                if (hitsEl) hitsEl.innerText = c.currentHits.toLocaleString();
+                const bar = document.getElementById(`bar-${c.id}`);
+                if (bar) bar.style.width = `${(c.currentHits / maxHits) * 100}%`;
+            });
+        }
+
+        // Day progress, current rate, projected end-of-day total, and Render cold-boot telemetry
+        function updateExpectedUI() {
+            const nowSec = colomboSecondsNow();
+            const soFar = expectedBetween(0, nowSec);
+            const projected = soFar + expectedBetween(nowSec, 86400);
+            const perHour = rateAt(nowSec) * 3600;
+            const share = projected > 0 ? (soFar / projected) * 100 : 0;
+            const dayPct = (nowSec / 86400) * 100;
+
+            const prog = document.getElementById('kpi-day-progress');
+            if (prog) prog.style.width = `${share.toFixed(1)}%`;
+            const sub = document.getElementById('kpi-rate-sub');
+            if (sub) sub.innerText = `${share.toFixed(0)}% of today's risk elapsed · now ≈${Math.round(perHour)}/hr`;
+            const proj = document.getElementById('kpi-projected');
+            if (proj) proj.innerText = Math.round(projected).toLocaleString();
+            const projNote = document.getElementById('kpi-projected-note');
+            if (projNote) projNote.innerText = SIM_STATE.hourlyWx ? "Uses today's hourly Colombo weather" : "Neutral-weather estimate";
+
+            // Update Render Cold-Boot explainer badges
+            const bClock = document.getElementById('calc-badge-clock');
+            if (bClock) bClock.innerText = `SLST: ${formatSimTime(nowSec)}`;
+            const bRate = document.getElementById('calc-badge-rate');
+            if (bRate) bRate.innerText = `Rate: ~${Math.round(perHour)}/hr`;
+            const dElapsed = document.getElementById('calc-day-elapsed');
+            if (dElapsed) dElapsed.innerText = `${dayPct.toFixed(1)}% (${(nowSec/3600).toFixed(1)}h elapsed)`;
+            const dSecs = document.getElementById('calc-day-secs');
+            if (dSecs) dSecs.innerText = `${nowSec.toLocaleString()} of 86,400s`;
+            const wStatus = document.getElementById('calc-wx-status');
+            if (wStatus) wStatus.innerText = SIM_STATE.hourlyWx ? "Open-Meteo Hourly Synced" : "Neutral Baseline Initialized";
         }
 
         // Initialize Corridor UI Cards
@@ -2029,14 +2461,89 @@
                 card.id = `card-${c.id}`;
                 card.innerHTML = `
                     <div class="corridor-name">${c.name}</div>
-                    <div class="corridor-meta">${c.mode} • Last: ${c.lastLocation}</div>
+                    <div class="corridor-meta">${c.mode} · ${c.lastLocation}</div>
                     <div class="corridor-stat-row">
-                        <span style="color: var(--text-muted);">Simulated Hits Today:</span>
-                        <span id="hits-${c.id}" style="color: #C53030; font-weight: 800;">0</span>
+                        <span style="color: var(--text-muted);">Estimated today</span>
+                        <span id="hits-${c.id}" style="color: var(--danger); font-weight: 800;">0</span>
                     </div>
+                    <div class="corridor-bar"><span id="bar-${c.id}" style="width:0%"></span></div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        // Helper: create a DOM element for a simulated or live incident item
+        function createIncidentDOMItem(incNumber, secTimestamp, corridor, incType, outcome, causeObj, envContext, isReported) {
+            const eventItem = document.createElement('div');
+            eventItem.className = `incident-item ${isReported ? 'reported' : (corridor.id === 'MMC_EXPRESS' ? 'mitigated' : 'unreported')}`;
+            
+            const timeStr = formatSimTime(secTimestamp);
+            const incId = `#INC-${String(incNumber).padStart(4, '0')}`;
+
+            eventItem.innerHTML = `
+                <div class="incident-header">
+                    <span class="incident-id-time">${incId} • ${timeStr} • <span style="color:#C53030;">${envContext}</span></span>
+                    <span class="incident-route-badge">${corridor.name}</span>
+                </div>
+                <div class="incident-nature">⚠️ ${incType.type}</div>
+                <div class="incident-cause">
+                    <strong>🔍 Probable Reason:</strong> ${causeObj.cause}
+                    <div style="font-size:0.77rem; color:#744210; margin-top:2px;"><em>${causeObj.detail}</em> [${causeObj.riskTier}]</div>
+                </div>
+                <div class="incident-context">${incType.desc} near ${corridor.lastLocation}.</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
+                    <span class="incident-legal">⚖️ ${incType.penalCode}</span>
+                    <span style="font-size:0.75rem; color:#718096; font-weight:600;">Category: ${incType.category}</span>
+                </div>
+                <div class="incident-outcome">
+                    <span>${outcome.icon}</span>
+                    <span><strong>Commuter Reaction:</strong> ${outcome.label} — ${outcome.desc}</span>
+                </div>
+            `;
+            return eventItem;
+        }
+
+        // Prepopulate the incident feed on load with historical events leading to current minute
+        function seedRecentIncidentStream(count = 5) {
+            const stream = document.getElementById('incident-stream');
+            if (!stream) return;
+            stream.innerHTML = "";
+            const currentTotal = SIM_STATE.totalIncidentsToday;
+            const nowSec = colomboSecondsNow();
+            const w = SIM_STATE.weather;
+
+            let envContext = "";
+            if (w.isMonsoonActive || w.precipitation > 0) {
+                envContext = "🌧️ Monsoon Cloudburst (Windows Shut, 160% Crush Load)";
+            } else if (w.isNightStressActive || (nowSec / 3600 >= 18.25 || nowSec / 3600 < 5.75)) {
+                envContext = "🌙 Post-Dusk CPTED Darkness Deficit";
+            } else {
+                envContext = `🌡️ ${w.temp.toFixed(1)}°C Thermal Stress (${w.humidity}% RH)`;
+            }
+
+            for (let i = 0; i < count; i++) {
+                const incNumber = Math.max(1, currentTotal - i);
+                const pastOffsetSec = Math.max(15, Math.round(i * 150 + 25));
+                const eventSec = Math.max(0, nowSec - pastOffsetSec);
+
+                const rand = Math.random();
+                let cumWeight = 0;
+                let corridor = CORRIDORS[0];
+                for (let c of CORRIDORS) {
+                    cumWeight += c.riskWeight;
+                    if (rand <= cumWeight) { corridor = c; break; }
+                }
+
+                const incType = INCIDENT_TYPES[Math.floor(Math.random() * INCIDENT_TYPES.length)];
+                const isReported = Math.random() < 0.04;
+                const outcome = isReported 
+                    ? (OUTCOMES.find(o => o.reported) || OUTCOMES[5])
+                    : OUTCOMES.filter(o => !o.reported)[Math.floor(Math.random() * (OUTCOMES.length - 1))];
+                const causeObj = PROBABLE_REASONS[incType.probableCauseIndex !== undefined ? incType.probableCauseIndex : Math.floor(Math.random() * PROBABLE_REASONS.length)];
+
+                const el = createIncidentDOMItem(incNumber, eventSec, corridor, incType, outcome, causeObj, envContext, isReported);
+                stream.appendChild(el);
+            }
         }
 
         // Render An Incident Tick Event
@@ -2086,7 +2593,7 @@
             if (cardEl) {
                 cardEl.classList.add('corridor-alert');
                 const hitsEl = document.getElementById(`hits-${selectedCorridor.id}`);
-                if (hitsEl) hitsEl.innerText = selectedCorridor.currentHits;
+                if (hitsEl) hitsEl.innerText = selectedCorridor.currentHits.toLocaleString();
                 setTimeout(() => cardEl.classList.remove('corridor-alert'), 600);
             }
 
@@ -2098,7 +2605,7 @@
             let envContext = "";
             if (w.isMonsoonActive || w.precipitation > 0) {
                 envContext = "🌧️ Monsoon Cloudburst (Windows Shut, 160% Crush Load)";
-            } else if (w.isNightStressActive || (SIM_STATE.simTimeSeconds/3600 >= 18.25)) {
+            } else if (w.isNightStressActive || (SIM_STATE.simTimeSeconds/3600 >= 18.25 || SIM_STATE.simTimeSeconds/3600 < 5.75)) {
                 envContext = "🌙 Post-Dusk CPTED Darkness Deficit";
             } else {
                 envContext = `🌡️ ${w.temp.toFixed(1)}°C Thermal Stress (${w.humidity}% RH)`;
@@ -2106,52 +2613,34 @@
 
             // Prepend Event to Incident Stream
             const stream = document.getElementById('incident-stream');
-            const eventItem = document.createElement('div');
-            eventItem.className = `incident-item ${isReported ? 'reported' : (selectedCorridor.id === 'MMC_EXPRESS' ? 'mitigated' : 'unreported')}`;
-            
-            const timeStr = formatSimTime(SIM_STATE.simTimeSeconds);
-            const incId = `#INC-${String(SIM_STATE.totalIncidentsToday).padStart(4, '0')}`;
-
-            // Match Probable Situational Cause
-            const causeObj = PROBABLE_REASONS[incType.probableCauseIndex !== undefined ? incType.probableCauseIndex : Math.floor(Math.random() * PROBABLE_REASONS.length)];
-
-            eventItem.innerHTML = `
-                <div class="incident-header">
-                    <span class="incident-id-time">${incId} • ${timeStr} • <span style="color:#C53030;">${envContext}</span></span>
-                    <span class="incident-route-badge">${selectedCorridor.name}</span>
-                </div>
-                <div class="incident-nature">⚠️ ${incType.type}</div>
-                <div class="incident-cause">
-                    <strong>🔍 Probable Reason:</strong> ${causeObj.cause}
-                    <div style="font-size:0.77rem; color:#744210; margin-top:2px;"><em>${causeObj.detail}</em> [${causeObj.riskTier}]</div>
-                </div>
-                <div class="incident-context">${incType.desc} near ${selectedCorridor.lastLocation}.</div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
-                    <span class="incident-legal">⚖️ ${incType.penalCode}</span>
-                    <span style="font-size:0.75rem; color:#718096; font-weight:600;">Category: ${incType.category}</span>
-                </div>
-                <div class="incident-outcome">
-                    <span>${outcome.icon}</span>
-                    <span><strong>Commuter Reaction:</strong> ${outcome.label} — ${outcome.desc}</span>
-                </div>
-            `;
-
-            stream.prepend(eventItem);
-            
-            // Limit stream items in DOM to 40 for optimal performance
-            if (stream.children.length > 40) {
-                stream.removeChild(stream.lastChild);
+            if (stream) {
+                const causeObj = PROBABLE_REASONS[incType.probableCauseIndex !== undefined ? incType.probableCauseIndex : Math.floor(Math.random() * PROBABLE_REASONS.length)];
+                const eventItem = createIncidentDOMItem(
+                    SIM_STATE.totalIncidentsToday,
+                    SIM_STATE.simTimeSeconds,
+                    selectedCorridor,
+                    incType,
+                    outcome,
+                    causeObj,
+                    envContext,
+                    isReported
+                );
+                stream.prepend(eventItem);
+                
+                // Limit stream items in DOM to 40 for optimal performance
+                if (stream.children.length > 40) {
+                    stream.removeChild(stream.lastChild);
+                }
             }
 
-            // Update KPI Displays
-            document.getElementById('kpi-incidents-total').innerText = SIM_STATE.totalIncidentsToday.toLocaleString();
-            document.getElementById('kpi-unreported').innerText = SIM_STATE.unreportedCount.toLocaleString();
-            document.getElementById('kpi-crowding').innerText = SIM_STATE.crowdingCount.toLocaleString();
-            document.getElementById('kpi-reported').innerText = SIM_STATE.reportedCount.toLocaleString();
+            // Update KPI Displays + corridor bars
+            renderCounters();
+            updateExpectedUI();
         }
 
         // Simulator Main Animation Loop (Continuously Locked to Real-Time Colombo Clock)
         let tickAccumulator = 0;
+        let lastExpectedUIUpdate = 0;
         function simulationLoop(timestamp) {
             if (!SIM_STATE.isRunning) {
                 SIM_STATE.lastTickTime = timestamp;
@@ -2163,25 +2652,35 @@
             SIM_STATE.lastTickTime = timestamp;
 
             // Continuously synchronized with Sri Lanka Standard Time (Asia/Colombo)
-            const nowColombo = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Colombo" }));
-            SIM_STATE.simTimeSeconds = nowColombo.getHours() * 3600 + nowColombo.getMinutes() * 60 + nowColombo.getSeconds();
+            const nowSec = colomboSecondsNow();
+            SIM_STATE.simTimeSeconds = nowSec;
+
+            // Midnight rollover, or the tab was hidden / device slept (rAF paused):
+            // recompute from the clock instead of replaying a burst of ticks.
+            if (nowSec < (SIM_STATE.lastClockSec || 0) || deltaSeconds > 20) {
+                seedFromExpectedCount();
+            }
+            SIM_STATE.lastClockSec = nowSec;
 
             // Update clock display
-            document.getElementById('sim-clock').innerText = formatSimTime(SIM_STATE.simTimeSeconds);
+            document.getElementById('sim-clock').innerText = formatSimTime(nowSec);
             const sev = computeDynamicSeverity();
             const tagEl = document.getElementById('sim-period-tag');
             tagEl.innerText = `${sev.diurnal.label} [${sev.multiplier.toFixed(2)}x Dynamic Severity]`;
             tagEl.className = `clock-period-tag ${sev.diurnal.isPeak || sev.multiplier > 1.5 ? 'peak' : ''}`;
 
-            // Steady, realistic real-time telemetry feed
-            // Dynamically pulses an incident every 5–8 seconds based on diurnal overcrowding factor
-            const baseRatePerSecond = 0.16;
-            const currentRatePerSecond = baseRatePerSecond * (sev.multiplier / 1.15);
-            tickAccumulator += currentRatePerSecond * deltaSeconds;
-
+            // Live feed uses the same calibrated rate as the time-derived backfill (λ = K · severity)
+            if (deltaSeconds > 0 && deltaSeconds <= 20) {
+                tickAccumulator += RATE_K * sev.multiplier * deltaSeconds;
+            }
             while (tickAccumulator >= 1.0) {
                 triggerIncidentTick();
                 tickAccumulator -= 1.0;
+            }
+
+            if (timestamp - lastExpectedUIUpdate > 5000) {
+                updateExpectedUI();
+                lastExpectedUIUpdate = timestamp;
             }
 
             requestAnimationFrame(simulationLoop);
@@ -2273,6 +2772,9 @@
         // Initialize All Charts on Load
         window.addEventListener('load', () => {
             initCorridorCards();
+            seedFromExpectedCount();
+            updateExpectedUI();
+            seedRecentIncidentStream(5);
             updateLogit();
             updateVolume();
 
@@ -2431,13 +2933,8 @@
                 }
             });
 
-            // Fetch Live Real-World Weather from Open-Meteo
+            // Fetch Live Real-World Weather from Open-Meteo (re-integrates today's hourly weather)
             fetchLiveColomboWeather();
-
-            // Seed initial telemetry feed with 3 recent incidents
-            for (let i = 0; i < 3; i++) {
-                triggerIncidentTick();
-            }
 
             // Start simulation engine animation loop
             requestAnimationFrame(simulationLoop);
