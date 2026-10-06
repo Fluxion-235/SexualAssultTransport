@@ -1,0 +1,20 @@
+# Render Infrastructure as Code (Blueprint) Specification
+# Deploy by navigating to: https://dashboard.render.com/blueprints
+# and connecting this repository.
+
+services:
+  # Primary Web Service running the Transit Telemetry application
+  - type: web
+    name: transit-harassment-telemetry
+    runtime: python
+    plan: free
+    region: singapore
+    branch: master
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    healthCheckPath: /healthz
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: PYTHON_VERSION
+        value: 3.11.9

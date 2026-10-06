@@ -179,25 +179,36 @@ def get_route_risk_data():
     routes = [
         {
             "Route": "Route 138 (Homagama ↔ Pettah)",
-            "Mode": "Municipal Bus",
+            "Mode": "Municipal Trunk Bus",
             "Overcrowding": 9.8,
             "StationDarkness": 8.5,
             "DurationExposure": 8.2,
             "StaffAbsence": 9.2,
             "PerceivedImpunity": 9.5,
-            "OverallRisk": 9.5,
-            "Classification": "Extreme Modal Risk"
+            "OverallRisk": 9.2,
+            "Classification": "Critical / Extreme Risk"
         },
         {
             "Route": "Route 100 (Panadura ↔ Pettah)",
-            "Mode": "Coastal Bus",
+            "Mode": "Coastal Trunk Bus",
             "Overcrowding": 9.4,
             "StationDarkness": 8.1,
             "DurationExposure": 8.6,
             "StaffAbsence": 8.8,
             "PerceivedImpunity": 9.1,
             "OverallRisk": 9.0,
-            "Classification": "Severe Risk"
+            "Classification": "Very High Risk"
+        },
+        {
+            "Route": "Route 154 (Kiribathgoda ↔ Angulana)",
+            "Mode": "Orbital Student/Hosp",
+            "Overcrowding": 9.2,
+            "StationDarkness": 8.0,
+            "DurationExposure": 8.9,
+            "StaffAbsence": 8.7,
+            "PerceivedImpunity": 9.0,
+            "OverallRisk": 8.8,
+            "Classification": "Severe Student Risk"
         },
         {
             "Route": "Kelani Valley (KV) Line",
@@ -211,47 +222,69 @@ def get_route_risk_data():
             "Classification": "Severe Risk"
         },
         {
-            "Route": "Coastal Railway Line",
-            "Mode": "Commuter Rail",
-            "Overcrowding": 9.1,
-            "StationDarkness": 7.9,
-            "DurationExposure": 8.4,
+            "Route": "Route 122 (Avissawella ↔ Pettah)",
+            "Mode": "Low Level Semi-Express",
+            "Overcrowding": 8.9,
+            "StationDarkness": 8.4,
+            "DurationExposure": 8.6,
             "StaffAbsence": 8.2,
-            "PerceivedImpunity": 8.6,
+            "PerceivedImpunity": 8.5,
             "OverallRisk": 8.5,
             "Classification": "High Risk"
         },
         {
-            "Route": "Northern Railway (Colombo ↔ Jaffna)",
-            "Mode": "Intercity Rail",
-            "Overcrowding": 6.0,
-            "StationDarkness": 6.5,
-            "DurationExposure": 9.5,
-            "StaffAbsence": 6.8,
-            "PerceivedImpunity": 7.4,
-            "OverallRisk": 7.2,
-            "Classification": "Duration-Driven Risk"
+            "Route": "Route 120 (Horana ↔ Pettah)",
+            "Mode": "Horana Commuter Bus",
+            "Overcrowding": 8.6,
+            "StationDarkness": 8.0,
+            "DurationExposure": 8.3,
+            "StaffAbsence": 8.0,
+            "PerceivedImpunity": 8.1,
+            "OverallRisk": 8.2,
+            "Classification": "High Risk"
         },
         {
-            "Route": "Expressway CM01 Metrobus",
+            "Route": "Route 240 (Negombo ↔ Colombo)",
+            "Mode": "Northern Arterial Bus",
+            "Overcrowding": 8.4,
+            "StationDarkness": 7.8,
+            "DurationExposure": 8.0,
+            "StaffAbsence": 7.9,
+            "PerceivedImpunity": 7.9,
+            "OverallRisk": 8.0,
+            "Classification": "High Risk"
+        },
+        {
+            "Route": "Route 177 (Kaduwela ↔ Kollupitiya)",
+            "Mode": "Tech & Campus Trunk",
+            "Overcrowding": 8.1,
+            "StationDarkness": 7.5,
+            "DurationExposure": 7.7,
+            "StaffAbsence": 7.8,
+            "PerceivedImpunity": 7.9,
+            "OverallRisk": 7.8,
+            "Classification": "Moderate-High Risk"
+        },
+        {
+            "Route": "Route CM01 Metrobus (Kadawatha ↔ MMC)",
             "Mode": "Expressway Bus",
-            "Overcrowding": 3.2,
-            "StationDarkness": 3.5,
-            "DurationExposure": 4.5,
-            "StaffAbsence": 4.0,
-            "PerceivedImpunity": 3.8,
-            "OverallRisk": 3.8,
-            "Classification": "Mitigated Corridor"
+            "Overcrowding": 2.5,
+            "StationDarkness": 2.8,
+            "DurationExposure": 3.0,
+            "StaffAbsence": 2.9,
+            "PerceivedImpunity": 2.8,
+            "OverallRisk": 2.8,
+            "Classification": "Low (CPTED Mitigated)"
         },
         {
             "Route": "Makumbura Multimodal Centre (MMC)",
             "Mode": "Integrated Terminal",
-            "Overcrowding": 3.5,
-            "StationDarkness": 2.2,
-            "DurationExposure": 2.8,
-            "StaffAbsence": 2.5,
-            "PerceivedImpunity": 2.9,
-            "OverallRisk": 3.2,
+            "Overcrowding": 2.6,
+            "StationDarkness": 2.0,
+            "DurationExposure": 2.4,
+            "StaffAbsence": 2.2,
+            "PerceivedImpunity": 2.4,
+            "OverallRisk": 2.5,
             "Classification": "Safe Engineered Hub"
         }
     ]
@@ -270,7 +303,7 @@ def plot_transit_harassment_heatmap(output_path="transit_harassment_heatmap.png"
     df_global = get_global_prevalence_data()
     df_routes = get_route_risk_data()
 
-    fig = plt.figure(figsize=(19, 10), dpi=300)
+    fig = plt.figure(figsize=(20, 11.5), dpi=300)
     gs = GridSpec(1, 2, width_ratios=[1.15, 1.45], wspace=0.28)
 
     # ----------------- PANEL 1: Global Prevalence & Reporting Gap -----------------
@@ -351,8 +384,8 @@ def plot_transit_harassment_heatmap(output_path="transit_harassment_heatmap.png"
                   fontsize=12.5, fontweight='bold', pad=14, loc='left', color="#1A252C")
 
     # Highlighting mitigated corridor vs high risk
-    ax2.axhline(5, color="#1E8449", lw=2.5, linestyle="--")
-    ax2.text(0.05, 5.2, "▼ Infrastructure Mitigation Threshold (MMC Terminal & Expressway Metrobuses)",
+    ax2.axhline(8, color="#1E8449", lw=2.5, linestyle="--")
+    ax2.text(0.05, 8.2, "▼ CPTED Infrastructure Mitigation Threshold (Expressway Metrobus & MMC Terminal Hub)",
              transform=ax2.get_yaxis_transform(), color="#1E8449", fontsize=9.5, fontweight='bold',
              bbox=dict(boxstyle="square,pad=0.2", fc="#EAFAF1", ec="#A9DFBF"))
 
@@ -607,16 +640,120 @@ def plot_complete_dashboard(output_path="transit_harassment_complete_dashboard.p
     print(f"[✓] Saved complete executive dashboard to: {output_path}")
 
 
+def plot_western_province_capacity_deficits(output_path="western_province_capacity_analysis.png"):
+    """
+    Creates Figure 4: Western Province Transit Network:
+      - Regional Office Jurisdictions & Permit Allocations
+      - Fleet Seating Capacity Distribution Tiers
+      - Route Operational Fulfillment Rates & Permit Deficits
+      - Daily Running Kilometers (Fleet Mileage Intensity)
+    """
+    fig, axes = plt.subplots(2, 2, figsize=(18, 13), dpi=300)
+    plt.subplots_adjust(hspace=0.32, wspace=0.26)
+
+    # 1. Regional Office Jurisdictions
+    ax1 = axes[0, 0]
+    offices = ['Colombo-01', 'Colombo-02', 'Colombo-03', 'Colombo-04', 'Gampaha-01', 'Gampaha-02', 'Kalutara']
+    permits = [1284, 896, 612, 548, 582, 745, 688]
+    colors_reg = ['#1B4F72', '#2874A6', '#3498DB', '#5DADE2', '#117864', '#16A085', '#D35400']
+    bars1 = ax1.bar(offices, permits, color=colors_reg, edgecolor='#333333', lw=0.9)
+    for b in bars1:
+        h = b.get_height()
+        ax1.text(b.get_x() + b.get_width()/2, h + 20, f"{h:,}", ha='center', va='bottom', fontsize=9.5, fontweight='bold')
+    ax1.set_ylim(0, 1450)
+    ax1.set_ylabel("Valid Permits Administered", fontsize=10.5, fontweight='bold')
+    ax1.set_title("1. Regional Office Jurisdictions & Regulatory Oversight\n(Total: 5,355 Valid Permits across 7 Regional Zones)", fontsize=11.5, fontweight='bold', loc='left')
+    ax1.tick_params(axis='x', rotation=15)
+
+    # 2. Fleet Seating Capacity Distribution Tiers
+    ax2 = axes[0, 1]
+    tiers = ['40–49 Seats\n(Suburban Backbone)', '50–60 Seats\n(High-Capacity)', '30–39 Seats\n(Mid-Capacity)', '20–29 Seats\n(A/C & Feeders)']
+    tier_counts = [1854, 1042, 486, 368]
+    colors_pie = ['#2980B9', '#1A5276', '#F39C12', '#C0392B']
+    wedges, texts, autotexts = ax2.pie(
+        tier_counts, labels=tiers, autopct='%1.1f%%', startangle=140,
+        colors=colors_pie, wedgeprops=dict(edgecolor='#FFFFFF', linewidth=2),
+        textprops=dict(fontsize=9.5, fontweight='bold')
+    )
+    for at in autotexts:
+        at.set_color('white')
+        at.set_fontsize(10)
+    ax2.set_title("2. Fleet Capacity & Seating Configuration Tiers\n(Total Fleet Permits: 3,750 Units Categorized)", fontsize=11.5, fontweight='bold', loc='left')
+
+    # 3. Route Operational Fulfillment Rates (%)
+    ax3 = axes[1, 0]
+    routes_def = [
+        'Rt 100 Normal (Panadura)',
+        'Rt 430 Normal (Mathugama)',
+        'Rt 122 Normal (Avissawella)',
+        'Rt 138 Normal (Homagama)',
+        'Rt 103 Normal (Narahenpita)',
+        'Rt 430 A/C (Mathugama)',
+        'Rt 120 Normal (Horana)',
+        'Rt 180 Normal (Nittambuwa)',
+        'Rt 200 Normal (Gampaha)',
+        'Rt 400 A/C (Aluthgama)',
+        'Rt 187 A/C (Airport)',
+        'Rt 240 Normal (Negombo)',
+        'Rt 187 Normal (Airport)'
+    ]
+    rates = [88.66, 87.50, 87.30, 87.18, 84.21, 78.72, 70.59, 68.00, 67.19, 65.63, 51.67, 49.35, 45.33]
+    colors_rate = ['#27AE60' if r >= 80 else ('#E67E22' if r >= 65 else '#C0392B') for r in rates]
+    bars3 = ax3.barh(routes_def, rates, color=colors_rate, edgecolor='#333333', lw=0.8)
+    for b in bars3:
+        w = b.get_width()
+        ax3.text(w + 1.2, b.get_y() + b.get_height()/2, f"{w:.1f}%", va='center', ha='left', fontsize=8.5, fontweight='bold')
+    ax3.set_xlim(0, 105)
+    ax3.xaxis.set_major_formatter(mtick.PercentFormatter())
+    ax3.invert_yaxis()
+    ax3.axvline(50, color='#C0392B', linestyle='--', lw=1.5, label='Severe Deficit (<50%)')
+    ax3.set_xlabel("Operational Fulfillment Rate (%)", fontsize=10.5, fontweight='bold')
+    ax3.set_title("3. Route Efficiency & Permit Fulfillment Deficits\n(Active Daily Fleet vs. Total Valid Permits Issued)", fontsize=11.5, fontweight='bold', loc='left')
+    ax3.legend(loc='lower right', fontsize=9)
+
+    # 4. Daily Running Kilometers (Fleet Mileage Intensity)
+    ax4 = axes[1, 1]
+    mileage_routes = [
+        'Rt 187 A/C (Airport)',
+        'Rt 103 Normal (6.8 km shuttle)',
+        'Rt 100 Normal (Panadura)',
+        'Rt 120 Normal (Horana)',
+        'Rt 240 Normal (Negombo)',
+        'Rt 430 A/C (Mathugama)',
+        'Rt 176 Normal (Karagampitiya)',
+        'Rt 122 Normal (Avissawella)'
+    ]
+    mileages = [69300.0, 63811.2, 49921.2, 49364.0, 43681.2, 42499.2, 42205.8, 41061.6]
+    colors_km = ['#8E44AD', '#2980B9', '#16A085', '#27AE60', '#D35400', '#E74C3C', '#2C3E50', '#34495E']
+    bars4 = ax4.barh(mileage_routes, [m/1000 for m in mileages], color=colors_km, edgecolor='#333333', lw=0.8)
+    for b in bars4:
+        w = b.get_width()
+        ax4.text(w + 1.0, b.get_y() + b.get_height()/2, f"{w:.1f}k km", va='center', ha='left', fontsize=8.5, fontweight='bold')
+    ax4.set_xlim(0, 80)
+    ax4.invert_yaxis()
+    ax4.set_xlabel("Daily Running Kilometers (in Thousands)", fontsize=10.5, fontweight='bold')
+    ax4.set_title("4. Fleet Mileage Generation & Intensity\n(Cumulative Active Kilometers per Day)", fontsize=11.5, fontweight='bold', loc='left')
+
+    plt.suptitle("Western Province Transit Network: Systemic Capacity, Jurisdictions & Operational Fulfillment",
+                 fontsize=15.5, fontweight='heavy', y=0.98, color="#0E1B25")
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"[✓] Saved Western Province capacity analysis to: {output_path}")
+
+
 # ==============================================================================
 # 6. MAIN EXECUTION / CLI HANDLER
 # ==============================================================================
 
 def main():
     parser = argparse.ArgumentParser(description="Visualize Transit Sexual Harassment Risk Models and Empirical Matrices")
-    parser.add_argument("--all", action="store_true", default=True, help="Generate all figures (heatmap, models, complete dashboard)")
+    parser.add_argument("--all", action="store_true", default=True, help="Generate all figures (heatmap, models, complete dashboard, capacity)")
     parser.add_argument("--heatmap", action="store_true", help="Generate transit_harassment_heatmap.png only")
     parser.add_argument("--models", action="store_true", help="Generate transit_mathematical_models.png only")
     parser.add_argument("--dashboard", action="store_true", help="Generate transit_harassment_complete_dashboard.png only")
+    parser.add_argument("--capacity", action="store_true", help="Generate western_province_capacity_analysis.png only")
     parser.add_argument("--print-tables", action="store_true", help="Print tabular model summaries to console")
 
     args = parser.parse_args()
@@ -645,12 +782,17 @@ def main():
     if args.dashboard or args.all:
         plot_complete_dashboard("transit_harassment_complete_dashboard.png")
 
+    if args.capacity or args.all:
+        plot_western_province_capacity_deficits("western_province_capacity_analysis.png")
+
     print("\nVisualization generation complete.")
     print("Generated files:")
     print("  • transit_harassment_heatmap.png")
     print("  • transit_mathematical_models.png")
     print("  • transit_harassment_complete_dashboard.png")
+    print("  • western_province_capacity_analysis.png")
 
 
 if __name__ == "__main__":
     main()
+

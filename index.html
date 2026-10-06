@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transit Sexual Harassment Risk - Mathematical Framework & Visualizer</title>
+    <title>Western Province Transit Network: Risk Simulation & Capacity Assessment</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -11,6 +11,7 @@
             --primary-accent: #2B6CB0;
             --danger: #E53E3E;
             --danger-dark: #9B2C2C;
+            --danger-bg: #FFF5F5;
             --success: #38A169;
             --warning: #DD6B20;
             --bg: #F7FAFC;
@@ -18,6 +19,7 @@
             --border: #E2E8F0;
             --text-dark: #2D3748;
             --text-muted: #718096;
+            --pulse-red: rgba(229, 62, 62, 0.4);
         }
 
         * {
@@ -35,26 +37,91 @@
         }
 
         header {
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             background: linear-gradient(135deg, #1A365D 0%, #2A4365 100%);
             color: white;
             padding: 28px 36px;
-            border-radius: 12px;
+            border-radius: 14px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
-        header h1 {
+        header .header-left h1 {
             font-size: 1.85rem;
             font-weight: 700;
             margin-bottom: 6px;
         }
 
-        header p {
-            font-size: 1rem;
+        header .header-left p {
+            font-size: 0.95rem;
             color: #E2E8F0;
-            max-width: 900px;
+            max-width: 850px;
         }
 
+        .header-live-badge {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 12px 18px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .live-dot {
+            width: 14px;
+            height: 14px;
+            background-color: #48BB78;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .live-dot.active-tick {
+            background-color: #F56565;
+            box-shadow: 0 0 0 8px var(--pulse-red);
+            transform: scale(1.3);
+        }
+
+        /* Top Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 22px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+            overflow-x: auto;
+        }
+
+        .nav-tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .nav-tab-btn:hover {
+            color: var(--primary-accent);
+            background: #EDF2F7;
+        }
+
+        .nav-tab-btn.active {
+            color: white;
+            background: var(--primary);
+            box-shadow: 0 2px 4px rgba(26, 54, 93, 0.2);
+        }
+
+        /* Layout Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
@@ -68,6 +135,7 @@
             border: 1px solid var(--border);
             padding: 22px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            transition: border-color 0.3s;
         }
 
         .card-title {
@@ -77,7 +145,7 @@
             margin-bottom: 6px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
         }
 
         .card-subtitle {
@@ -87,14 +155,15 @@
         }
 
         .col-12 { grid-column: span 12; }
+        .col-8  { grid-column: span 8; }
         .col-6  { grid-column: span 6; }
         .col-4  { grid-column: span 4; }
-        .col-8  { grid-column: span 8; }
 
         @media (max-width: 1024px) {
-            .col-6, .col-4, .col-8 { grid-column: span 12; }
+            .col-8, .col-6, .col-4 { grid-column: span 12; }
         }
 
+        /* KPI Cards */
         .kpi-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -102,11 +171,15 @@
             margin-bottom: 24px;
         }
 
+        @media (max-width: 900px) {
+            .kpi-container { grid-template-columns: repeat(2, 1fr); }
+        }
+
         .kpi-card {
             background: white;
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 18px 20px;
+            padding: 16px 18px;
             border-left: 5px solid var(--primary-accent);
         }
 
@@ -115,7 +188,7 @@
         .kpi-card.success { border-left-color: var(--success); }
 
         .kpi-label {
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             text-transform: uppercase;
             font-weight: 700;
             color: var(--text-muted);
@@ -123,15 +196,292 @@
         }
 
         .kpi-value {
-            font-size: 1.85rem;
+            font-size: 1.75rem;
             font-weight: 800;
             color: var(--text-dark);
-            margin: 6px 0 2px 0;
+            margin: 4px 0 2px 0;
+            font-variant-numeric: tabular-nums;
         }
 
         .kpi-note {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--text-muted);
+        }
+
+        /* Simulator Control Bar */
+        .sim-control-panel {
+            background: #FFFFFF;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 18px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.08);
+        }
+
+        .sim-clock-display {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .clock-digital {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: #1A202C;
+            color: #68D391;
+            padding: 6px 14px;
+            border-radius: 8px;
+            letter-spacing: 1px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .clock-period-tag {
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: #E2E8F0;
+            color: #2D3748;
+        }
+
+        .clock-period-tag.peak {
+            background: #FED7D7;
+            color: #9B2C2C;
+            border: 1px solid #FEB2B2;
+        }
+
+        .sim-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sim-btn {
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sim-btn-play {
+            background: #38A169;
+            color: white;
+        }
+        .sim-btn-play:hover { background: #2F855A; }
+
+        .sim-btn-pause {
+            background: #DD6B20;
+            color: white;
+        }
+        .sim-btn-pause:hover { background: #C05621; }
+
+        .sim-btn-step {
+            background: #3182CE;
+            color: white;
+        }
+        .sim-btn-step:hover { background: #2B6CB0; }
+
+        .sim-btn-reset {
+            background: #E2E8F0;
+            color: #4A5568;
+        }
+        .sim-btn-reset:hover { background: #CBD5E0; }
+
+        .speed-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .speed-selector select {
+            padding: 7px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-weight: 700;
+            color: var(--primary);
+            background: white;
+        }
+
+        /* Live Incident Ticker Feed */
+        .incident-feed-container {
+            max-height: 480px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 6px;
+        }
+
+        .incident-item {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-left: 5px solid #E53E3E;
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            animation: fadeInSlide 0.3s ease-out;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .incident-item.unreported {
+            border-left-color: #E53E3E;
+        }
+
+        .incident-item.reported {
+            border-left-color: #3182CE;
+            background: #EBF8FF;
+        }
+
+        .incident-item.mitigated {
+            border-left-color: #38A169;
+            background: #F0FFF4;
+        }
+
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .incident-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82rem;
+        }
+
+        .incident-id-time {
+            font-weight: 800;
+            color: #2D3748;
+        }
+
+        .incident-route-badge {
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            background: #EDF2F7;
+            color: #2D3748;
+        }
+
+        .incident-nature {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #9B2C2C;
+        }
+
+        .incident-context {
+            font-size: 0.82rem;
+            color: #4A5568;
+        }
+
+        .incident-outcome {
+            font-size: 0.8rem;
+            font-style: italic;
+            color: #718096;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-top: 1px dashed var(--border);
+            padding-top: 5px;
+            margin-top: 2px;
+        }
+
+        .incident-cause {
+            font-size: 0.81rem;
+            color: #C05621;
+            background: #FFFAF0;
+            border-left: 3px solid #DD6B20;
+            padding: 5px 9px;
+            border-radius: 4px;
+            font-weight: 500;
+            line-height: 1.35;
+        }
+
+        .incident-cause strong {
+            color: #9C4221;
+            font-weight: 700;
+        }
+
+        .incident-legal {
+            font-size: 0.72rem;
+            color: #4A5568;
+            background: #EDF2F7;
+            padding: 2px 7px;
+            border-radius: 4px;
+            display: inline-block;
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        @keyframes pulseDot {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        /* Corridor Status Cards Grid */
+        .corridor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+        }
+
+        .corridor-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            background: #FAFAFA;
+            position: relative;
+            transition: all 0.25s ease;
+        }
+
+        .corridor-card.corridor-alert {
+            background: #FFF5F5;
+            border-color: #E53E3E;
+            box-shadow: 0 0 12px rgba(229, 62, 62, 0.3);
+            transform: scale(1.02);
+        }
+
+        .corridor-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+
+        .corridor-meta {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .corridor-stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
 
         /* Interactive controls */
@@ -163,28 +513,27 @@
             color: var(--primary);
         }
 
-        /* Heatmap table styling */
-        .heatmap-table {
+        /* Tables */
+        .custom-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.88rem;
+            font-size: 0.86rem;
         }
 
-        .heatmap-table th, .heatmap-table td {
+        .custom-table th, .custom-table td {
             padding: 10px 12px;
-            text-align: center;
+            text-align: left;
             border: 1px solid var(--border);
         }
 
-        .heatmap-table th {
+        .custom-table th {
             background-color: #EDF2F7;
             font-weight: 700;
             color: var(--text-dark);
         }
 
-        .heatmap-table td.route-name {
-            text-align: left;
-            font-weight: 600;
+        .custom-table tr:hover {
+            background-color: #F8FAFC;
         }
 
         .badge {
@@ -202,266 +551,1684 @@
 
         .score-pill {
             font-weight: 800;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 6px;
             display: inline-block;
+            font-size: 0.85rem;
+        }
+
+        /* Tab Visibility */
+        .tab-section {
+            display: none;
+        }
+
+        .tab-section.active {
+            display: block;
         }
     </style>
 </head>
 <body>
 
+    <!-- Header -->
     <header>
-        <h1>Transit Sexual Harassment Risk & Econometric Modeling</h1>
-        <p>Mathematical utility formulations, CPTED environmental regression, regional reporting gaps, and route risk determinants across South Asian transit corridors.</p>
+        <div class="header-left">
+            <h1>Western Province Transit Network: Risk Simulation & Capacity Analysis</h1>
+            <p>Discrete choice mathematical models, real-time incident tick engine, corridor operational deficits, and regulatory oversight across Sri Lanka's commuter network.</p>
+        </div>
+        <div class="header-live-badge">
+            <div class="live-dot" id="live-dot-indicator"></div>
+            <div>
+                <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px; color: #CBD5E0;">Tick Engine Status</div>
+                <div style="font-size: 0.95rem; font-weight: 800;" id="live-status-text">SIMULATOR ACTIVE</div>
+            </div>
+        </div>
     </header>
 
-    <!-- Top KPI cards -->
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab-btn active" onclick="switchTab('tab-simulator')">⏱️ Live Incident Telemetry & Radar</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-routes-tariffs')">🚍 Route Corridors, Tariffs & Risk Profiles</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-corridors')">🗺️ Corridor Risk Heatmap & Reporting Gap</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-operations')">📊 Systemic Capacity & Operational Deficits</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-models')">📐 Econometric Models & Demographics</button>
+    </div>
+
+    <!-- Top KPI cards (Dynamic from Simulation) -->
     <div class="kpi-container">
         <div class="kpi-card danger">
-            <div class="kpi-label">Sri Lanka Bus Lifetime Risk</div>
-            <div class="kpi-value">90.0% – 96.0%</div>
-            <div class="kpi-note">Peak on Colombo suburban buses</div>
+            <div class="kpi-label">Simulated Incidents Today</div>
+            <div class="kpi-value" id="kpi-incidents-total">0</div>
+            <div class="kpi-note" id="kpi-rate-sub">Rate: ~3.5 per minute (211/hr)</div>
         </div>
         <div class="kpi-card warning">
-            <div class="kpi-label">Victim Silence Rate</div>
-            <div class="kpi-value">92.0%</div>
-            <div class="kpi-note">Under 8% file formal police reports</div>
+            <div class="kpi-label">Suffer in Silence (96%)</div>
+            <div class="kpi-value" id="kpi-unreported">0</div>
+            <div class="kpi-note">Victims unassisted / silent (92-96%)</div>
         </div>
         <div class="kpi-card danger">
-            <div class="kpi-label">Primary Risk Enabler</div>
-            <div class="kpi-value">70.3%</div>
-            <div class="kpi-note">Vehicular passenger overcrowding</div>
+            <div class="kpi-label">Overcrowding Triggered (70.3%)</div>
+            <div class="kpi-value" id="kpi-crowding">0</div>
+            <div class="kpi-note">Crush-load standing enabler</div>
         </div>
         <div class="kpi-card success">
-            <div class="kpi-label">CPTED Mitigation Impact</div>
-            <div class="kpi-value">-65%</div>
-            <div class="kpi-note">Risk drop at MMC & Metrobus facilities</div>
+            <div class="kpi-label">Police Reports Lodged (4%)</div>
+            <div class="kpi-value" id="kpi-reported">0</div>
+            <div class="kpi-note">Formal legal action initiated</div>
         </div>
     </div>
 
-    <div class="grid">
-        <!-- Interactive Model 1: Binary Logit Calculator -->
-        <div class="card col-6">
-            <div class="card-title">1. Binary Logit Vulnerability Calculator</div>
-            <div class="card-subtitle">Probability of experiencing transit harassment: P = 1 / (1 + e^-U)</div>
+    <!-- ========================================================================= -->
+    <!-- TAB 1: LIVE INCIDENT TICK SIMULATOR                                        -->
+    <!-- ========================================================================= -->
+    <div id="tab-simulator" class="tab-section active">
+        
+        <!-- LIVE REAL-WORLD INTERNET DATA & TELEMETRY SYNC BAR -->
+        <div class="live-weather-panel" id="live-weather-bar" style="background: #FFFFFF; border: 1px solid var(--border); border-left: 6px solid #2B6CB0; border-radius: 12px; padding: 14px 20px; margin-bottom: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="display: inline-block; width: 10px; height: 10px; background: #38A169; border-radius: 50%; box-shadow: 0 0 0 4px rgba(56, 161, 105, 0.25);" id="live-internet-badge"></span>
+                    <strong style="font-size: 0.95rem; color: var(--primary);">🌍 REAL-WORLD INTERNET TELEMETRY LINK — COLOMBO, SRI LANKA</strong>
+                    <span style="font-size: 0.78rem; background: #EDF2F7; padding: 2px 8px; border-radius: 4px; color: var(--text-muted);" id="live-station-label">Open-Meteo Satellite Station (6.93°N, 79.86°E)</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #2B6CB0; background: #EBF8FF; padding: 4px 10px; border-radius: 6px; border: 1px solid #BEE3F8;">
+                        ● Autonomous Clock Sync (Asia/Colombo)
+                    </span>
+                </div>
+            </div>
+
+            <!-- Weather Metrics Row -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; font-size: 0.82rem;">
+                <div style="background: #F8FAFC; border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px;">
+                    <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase;">Air Temperature</div>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #C53030;" id="live-temp-val">31.1°C</div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem;" id="live-heat-desc">High Heat Stress (Doorway Crush)</div>
+                </div>
+                <div style="background: #F8FAFC; border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px;">
+                    <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase;">Relative Humidity</div>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #2B6CB0;" id="live-humid-val">61%</div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem;">Tropical Transit Atmosphere</div>
+                </div>
+                <div style="background: #F8FAFC; border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px;">
+                    <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase;">Precipitation / Rain</div>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #38A169;" id="live-rain-val">0.0 mm</div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem;" id="live-rain-desc">Normal Windows & Flow</div>
+                </div>
+                <div style="background: #F8FAFC; border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px;">
+                    <div style="color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase;">CPTED Lighting / Sun</div>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #DD6B20;" id="live-sun-val">Daylight</div>
+                    <div style="color: var(--text-muted); font-size: 0.72rem;" id="live-sun-desc">Full Sightlines (Sunset ~18:05)</div>
+                </div>
+                <div style="background: #FFF5F5; border: 1px solid #FEB2B2; padding: 8px 12px; border-radius: 6px;">
+                    <div style="color: #9B2C2C; font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Dynamic Risk Severity</div>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #9B2C2C;" id="live-sev-multiplier">1.32x</div>
+                    <div style="color: #C53030; font-size: 0.72rem; font-weight: 600;" id="live-sev-note">Midday Transition Surge</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulation Control Bar (Clean & Automated) -->
+        <div class="sim-control-panel">
+            <div class="sim-clock-display">
+                <div class="clock-digital" id="sim-clock">11:45:00 AM</div>
+                <div>
+                    <div class="clock-period-tag" id="sim-period-tag">MIDDAY COMMERCIAL SHIFT (1.15x)</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;" id="sim-day-window-label">Synced: Tuesday, Colombo (Asia/Colombo)</div>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px; background: #EBF8FF; border: 1px solid #BEE3F8; border-radius: 6px; padding: 6px 12px; font-size: 0.84rem; font-weight: 700; color: #2B6CB0;">
+                    <span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:#3182CE; box-shadow:0 0 8px rgba(49,130,206,0.8); animation: pulseDot 2s infinite;"></span>
+                    <span>Continuous Real-Time Sync (Asia/Colombo)</span>
+                </div>
+                <button class="sim-btn" id="btn-audio-toggle" style="background:#EDF2F7; color:#2D3748; padding:7px 12px;" onclick="toggleAudio()">
+                    🔊 Sound: ON
+                </button>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Left: Live Incident Stream -->
+            <div class="card col-7">
+                <div class="card-title">
+                    <span>📡 Live Incident Telemetry Stream</span>
+                    <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);" id="stream-count-label">Showing recent events</span>
+                </div>
+                <div class="card-subtitle">Real-time stochastic feed simulated from empirical Asian Development Bank (ADB) & UNFPA transit data</div>
+                
+                <div class="incident-feed-container" id="incident-stream">
+                    <!-- Events will dynamically prepend here -->
+                </div>
+            </div>
+
+            <!-- Right: Active Corridor Radar & Dynamic Risk Status -->
+            <div class="card col-5">
+                <div class="card-title">
+                    <span>🚍 Active Corridor Radar</span>
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #E53E3E;">Real-Time Hits</span>
+                </div>
+                <div class="card-subtitle">Corridors flash red upon incident detection; metrics update on every tick</div>
+
+                <div class="corridor-grid" id="corridor-cards-container">
+                    <!-- Corridor status tiles will be dynamically injected -->
+                </div>
+            </div>
+
+            <!-- Full-Width Card: Probable Environmental & Situational Drivers -->
+            <div class="card col-12" style="border-left: 6px solid #D69E2E; margin-top: 6px;">
+                <div class="card-title">
+                    <span>🔍 Probable Situational Drivers & Environmental Risk Catalysts (Western Province Corridors)</span>
+                    <span class="badge badge-high">Empirical Criminogenic Triggers</span>
+                </div>
+                <div class="card-subtitle">Empirically validated structural catalysts that trigger, accelerate, or facilitate transit sexual harassment and assault across Sri Lankan commuter lines</div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; margin-top: 14px;">
+                    <!-- Driver 1 -->
+                    <div style="background:#FFFDF5; border:1px solid #ECC94B; border-radius:8px; padding:13px 15px;">
+                        <div style="font-weight:800; color:#B7791F; font-size:0.92rem; margin-bottom:5px;">
+                            1. Standee Crush Overcrowding (>6.5 pers/m²)
+                        </div>
+                        <div style="font-size:0.83rem; color:#4A5568; line-height:1.45;">
+                            <strong>70.3% Primary Catalyst:</strong> Peak services on High Level (Rt 138) & Galle Road (Rt 100) run at 160%–185% capacity. Severe physical compression eliminates personal space, enabling perpetrators to force physical touch ("jacking") with plausible deniability.
+                        </div>
+                        <div style="margin-top:7px; font-size:0.75rem; color:#744210; font-weight:700;">
+                            🛡️ Countermeasure: Strict NTC peak load regulation & SLTB double-decker deployment.
+                        </div>
+                    </div>
+
+                    <!-- Driver 2 -->
+                    <div style="background:#FFFDF5; border:1px solid #ECC94B; border-radius:8px; padding:13px 15px;">
+                        <div style="font-weight:800; color:#B7791F; font-size:0.92rem; margin-bottom:5px;">
+                            2. Driver Hard Braking & Acceleration Inertia
+                        </div>
+                        <div style="font-size:0.83rem; color:#4A5568; line-height:1.45;">
+                            <strong>54.8% Groping Trigger:</strong> Erratic driving and abrupt deceleration in heavy Colombo traffic create momentum surges that offenders exploit to lurch forward and grab or press against standees under the guise of losing footing.
+                        </div>
+                        <div style="margin-top:7px; font-size:0.75rem; color:#744210; font-weight:700;">
+                            🛡️ Countermeasure: Driver telematics, acceleration sensors & smooth-transit licensing.
+                        </div>
+                    </div>
+
+                    <!-- Driver 3 -->
+                    <div style="background:#FFFDF5; border:1px solid #ECC94B; border-radius:8px; padding:13px 15px;">
+                        <div style="font-weight:800; color:#B7791F; font-size:0.92rem; margin-bottom:5px;">
+                            3. CPTED Darkness Deficits (<10 Lux at Halts)
+                        </div>
+                        <div style="font-size:0.83rem; color:#4A5568; line-height:1.45;">
+                            <strong>84.1% Night Risk Factor:</strong> Unlit roadside halts and dark access pathways (esp. peripheral halts on Rt 120 Horana and Rt 122 Avissawella) lack natural surveillance, creating predatory stalking corridors after dusk.
+                        </div>
+                        <div style="margin-top:7px; font-size:0.75rem; color:#744210; font-weight:700;">
+                            🛡️ Countermeasure: High-lux white solar LED lighting (>150 lux) & clear-sight glass shelters.
+                        </div>
+                    </div>
+
+                    <!-- Driver 4 -->
+                    <div style="background:#FFFDF5; border:1px solid #ECC94B; border-radius:8px; padding:13px 15px;">
+                        <div style="font-weight:800; color:#B7791F; font-size:0.92rem; margin-bottom:5px;">
+                            4. Monsoon Rains & Closed-Window Confinement
+                        </div>
+                        <div style="font-size:0.83rem; color:#4A5568; line-height:1.45;">
+                            <strong>+55% Physical Contact Surge:</strong> Heavy tropical downpours force sliding windows shut. Internal humidity (>85%) causes window condensation, blocking exterior sightlines from the street and creating claustrophobic in-cabin confinement.
+                        </div>
+                        <div style="margin-top:7px; font-size:0.75rem; color:#744210; font-weight:700;">
+                            🛡️ Countermeasure: Forced ventilation HVAC systems & anti-fog cabin airflow.
+                        </div>
+                    </div>
+
+                    <!-- Driver 5 -->
+                    <div style="background:#FFFDF5; border:1px solid #ECC94B; border-radius:8px; padding:13px 15px;">
+                        <div style="font-weight:800; color:#B7791F; font-size:0.92rem; margin-bottom:5px;">
+                            5. Conductor Absenteeism & Crew Indifference
+                        </div>
+                        <div style="font-size:0.83rem; color:#4A5568; line-height:1.45;">
+                            <strong>88.5% Offender Impunity Enabler:</strong> Private bus crew prioritize revenue per trip. Conductors actively squeeze through packed aisles shouting at passengers to 'step further back', ignoring distress protests and discouraging bystander support.
+                        </div>
+                        <div style="margin-top:7px; font-size:0.75rem; color:#744210; font-weight:700;">
+                            🛡️ Countermeasure: Mandatory conductor de-escalation certification & automated contactless ticketing.
+                        </div>
+                    </div>
+
+                    <!-- Driver 6 -->
+                    <div style="background:#FFFDF5; border:1px solid #ECC94B; border-radius:8px; padding:13px 15px;">
+                        <div style="font-weight:800; color:#B7791F; font-size:0.92rem; margin-bottom:5px;">
+                            6. Substandard 2x3 Vehicle Ergonomics (<45 cm Aisle)
+                        </div>
+                        <div style="font-size:0.83rem; color:#4A5568; line-height:1.45;">
+                            <strong>Vehicle Design Defect:</strong> Over-configured 2x3 seating layouts in mid-size suburban buses compress aisle width below ergonomic safety thresholds, guaranteeing constant friction and body contact during movement.
+                        </div>
+                        <div style="margin-top:7px; font-size:0.75rem; color:#744210; font-weight:700;">
+                            🛡️ Countermeasure: Phasing out 2x3 layouts in favor of standard 2x2 wide-aisle low-floor fleet.
+                        </div>
+                    </div>
+
+                    <!-- Driver 7 -->
+                    <div style="background:#FFFDF5; border:1px solid #ECC94B; border-radius:8px; padding:13px 15px;">
+                        <div style="font-weight:800; color:#B7791F; font-size:0.92rem; margin-bottom:5px;">
+                            7. Absence of Female Safety Partitions & Enclosures
+                        </div>
+                        <div style="font-size:0.83rem; color:#4A5568; line-height:1.45;">
+                            <strong>Spatial Segregation Deficit:</strong> Sri Lankan municipal buses lack physical protective partitions between priority front seats and standing aisles, allowing standees to loom directly over seated female passengers.
+                        </div>
+                        <div style="margin-top:7px; font-size:0.75rem; color:#744210; font-weight:700;">
+                            🛡️ Countermeasure: Transparent acrylic protective bulkheads for designated female priority zones.
+                        </div>
+                    </div>
+
+                    <!-- Driver 8 -->
+                    <div style="background:#FFFDF5; border:1px solid #ECC94B; border-radius:8px; padding:13px 15px;">
+                        <div style="font-weight:800; color:#B7791F; font-size:0.92rem; margin-bottom:5px;">
+                            8. Rear-Door Bottleneck Lingering Tactic
+                        </div>
+                        <div style="font-size:0.83rem; color:#4A5568; line-height:1.45;">
+                            <strong>Egress Exploitation:</strong> Perpetrators deliberately position themselves at the narrow rear doorway of private buses to physically obstruct and brush against female commuters boarding or alighting.
+                        </div>
+                        <div style="margin-top:7px; font-size:0.75rem; color:#744210; font-weight:700;">
+                            🛡️ Countermeasure: Dual-door one-way boarding/alighting discipline & wide pneumatic doors.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 2: ROUTE CORRIDORS, TARIFFS & RISK PROFILES                           -->
+    <!-- ========================================================================= -->
+    <div id="tab-routes-tariffs" class="tab-section">
+        <div class="grid">
             
-            <div class="control-group">
-                <label>Gender:</label>
-                <select id="logit-female" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
-                    <option value="1">Female (β = +3.703, t = 9.45)</option>
-                    <option value="0">Male (Reference category)</option>
-                </select>
+            <!-- Section 1: High-Density Western Province Commuter Trunk Corridors -->
+            <div class="card col-12" style="border-left: 6px solid #C0392B;">
+                <div class="card-title">
+                    <span>1. High-Density Western Province Commuter Trunk Corridors</span>
+                    <span class="badge badge-extreme">Critical Volume & Overcrowding Risk</span>
+                </div>
+                <div class="card-subtitle">Connecting peripheral suburban hubs to the Colombo Central Business District (Fort/Pettah) with highest passenger throughput and daily mileage</div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 10px;">
+                    <!-- Route 138 -->
+                    <div style="background: #FAFAFA; border: 1px solid var(--border); border-radius: 8px; padding: 14px; border-top: 4px solid #721C24;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <strong style="font-size: 1.05rem; color: #1A365D;">Route 138 (Homagama / Maharagama / Kottawa ↔ Pettah / Fort)</strong>
+                            <span class="score-pill" style="background: #721C24; color: white;">9.2 / 10 • Critical</span>
+                        </div>
+                        <div style="font-size: 0.83rem; color: #4A5568; margin-bottom: 8px;"><strong>Corridor:</strong> Flagship High Level Road Arterial Trunk</div>
+                        <div style="font-size: 0.82rem; line-height: 1.5; color: #2D3748;">
+                            <p><strong>• Operational Volume:</strong> Homagama–Pettah normal service operates <strong>78 permits</strong> (13,600 km/day). Supporting branches: Kottawa–Pettah (<strong>67 permits</strong>, 9,120 km) and Maharagama–Pettah (<strong>53 permits</strong>, 6,880 km). Combined >198 active buses daily.</p>
+                            <p style="margin-top: 4px;"><strong>• Tariff Structure:</strong> Municipal stage-based fare schedule.</p>
+                            <p style="margin-top: 4px; color: #9B2C2C; background: #FFF5F5; padding: 6px 8px; border-radius: 4px; border-left: 3px solid #E53E3E;">
+                                <strong>• Transit Safety & Harassment:</strong> Severe peak-hour congestion (05:00 AM–12:00 PM & 04:00 PM–07:00 PM) forces extreme passenger packing. Surveys indicate <strong>70.3% to 85%</strong> of female commuters cite overcrowding as primary enabler of non-consensual physical contact, frottage, and spatial invasion.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Route 100 -->
+                    <div style="background: #FAFAFA; border: 1px solid var(--border); border-radius: 8px; padding: 14px; border-top: 4px solid #900C3F;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <strong style="font-size: 1.05rem; color: #1A365D;">Route 100 (Panadura / Moratuwa ↔ Pettah / Fort)</strong>
+                            <span class="score-pill" style="background: #900C3F; color: white;">9.0 / 10 • Very High</span>
+                        </div>
+                        <div style="font-size: 0.83rem; color: #4A5568; margin-bottom: 8px;"><strong>Corridor:</strong> Galle Road Primary Coastal Arterial</div>
+                        <div style="font-size: 0.82rem; line-height: 1.5; color: #2D3748;">
+                            <p><strong>• Operational Volume:</strong> Operates <strong>97 valid normal permits</strong> recording <strong>49,921 daily running km</strong>, alongside 12 AC permits (606 km). Moratuwa–Pettah branch adds <strong>50 permits</strong> (8,492 km).</p>
+                            <p style="margin-top: 4px;"><strong>• Tariff Structure:</strong> Municipal stage-based fare schedule.</p>
+                            <p style="margin-top: 4px; color: #900C3F; background: #FFF5F5; padding: 6px 8px; border-radius: 4px; border-left: 3px solid #C0392B;">
+                                <strong>• Transit Safety & Harassment:</strong> Continuous rapid boarding/alighting along densely populated coastal corridor creates high transit anonymity, leading to frequent unpunished physical and non-verbal harassment.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Route 120 -->
+                    <div style="background: #FAFAFA; border: 1px solid var(--border); border-radius: 8px; padding: 14px; border-top: 4px solid #D35400;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <strong style="font-size: 1.05rem; color: #1A365D;">Route 120 (Horana / Kesbewa ↔ Pettah)</strong>
+                            <span class="score-pill" style="background: #D35400; color: white;">8.2 / 10 • High</span>
+                        </div>
+                        <div style="font-size: 0.83rem; color: #4A5568; margin-bottom: 8px;"><strong>Corridor:</strong> Piliyandala Inland Arterial (Kalutara ↔ Colombo)</div>
+                        <div style="font-size: 0.82rem; line-height: 1.5; color: #2D3748;">
+                            <p><strong>• Operational Volume:</strong> Features <strong>69 normal permits</strong> on Kesbewa–Pettah (11,316 km) and <strong>51 normal permits</strong> on Horana–Pettah (49,364 km). Notable for high AC fleet presence (<strong>31 AC permits</strong> generating 41,554 km).</p>
+                            <p style="margin-top: 4px;"><strong>• Tariff Structure:</strong> Stage-based normal and premium AC tariffs.</p>
+                            <p style="margin-top: 4px; color: #D35400; background: #FFFDF0; padding: 6px 8px; border-radius: 4px; border-left: 3px solid #D35400;">
+                                <strong>• Transit Safety & Harassment:</strong> Long travel distances (>20 km to >40 km) combined with mixed seating configurations increase passenger proximity exposure duration.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Route 122 -->
+                    <div style="background: #FAFAFA; border: 1px solid var(--border); border-radius: 8px; padding: 14px; border-top: 4px solid #C0392B;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <strong style="font-size: 1.05rem; color: #1A365D;">Route 122 (Avissawella ↔ Pettah)</strong>
+                            <span class="score-pill" style="background: #C0392B; color: white;">8.5 / 10 • High</span>
+                        </div>
+                        <div style="font-size: 0.83rem; color: #4A5568; margin-bottom: 8px;"><strong>Corridor:</strong> Eastern Border Arterial Trunk</div>
+                        <div style="font-size: 0.82rem; line-height: 1.5; color: #2D3748;">
+                            <p><strong>• Operational Volume:</strong> Operates <strong>63 normal permits</strong> covering <strong>41,061 daily running km</strong>.</p>
+                            <p style="margin-top: 4px;"><strong>• Tariff Structure:</strong> Normal inter-suburban fare; interprovincial extension to Ratnapura is LKR 453.00 (Normal) / LKR 890.00 (AC).</p>
+                            <p style="margin-top: 4px; color: #C0392B; background: #FFF5F5; padding: 6px 8px; border-radius: 4px; border-left: 3px solid #C0392B;">
+                                <strong>• Transit Safety & Harassment:</strong> Long travel times increase passenger fatigue and vulnerability, particularly on late evening return journeys across rural-urban fringes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label>Employment & Student Status:</label>
-                <select id="logit-occup" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
-                    <option value="employed">Employed / Occupational Commuter (β = +1.064)</option>
-                    <option value="student">Student Commuter (β = +0.596)</option>
-                    <option value="none">Neither / Non-work traveler (Baseline)</option>
-                </select>
+            <!-- Section 2: Suburban Orbital & Airport Interconnects -->
+            <div class="card col-12" style="border-left: 6px solid #2B6CB0;">
+                <div class="card-title">
+                    <span>2. Suburban Orbital & Airport Interconnects</span>
+                    <span class="badge badge-high">Cross-Town & Specialized Corridors</span>
+                </div>
+                <div class="card-subtitle">Orbital routes facilitating cross-town transfers without entering the congested Colombo central core</div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 10px;">
+                    <!-- Route 154 -->
+                    <div style="background: #FAFAFA; border: 1px solid var(--border); border-radius: 8px; padding: 14px; border-top: 4px solid #C0392B;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <strong style="font-size: 1.05rem; color: #1A365D;">Route 154 (Kiribathgoda ↔ Angulana / Mt. Lavinia)</strong>
+                            <span class="score-pill" style="background: #C0392B; color: white;">8.8 / 10 • High</span>
+                        </div>
+                        <div style="font-size: 0.83rem; color: #4A5568; margin-bottom: 8px;"><strong>Corridor:</strong> North-South Orbital via Borella & Narahenpita</div>
+                        <div style="font-size: 0.82rem; line-height: 1.5; color: #2D3748;">
+                            <p><strong>• Operational Volume:</strong> Runs <strong>72 permits</strong> generating <strong>10,641 daily running km</strong>.</p>
+                            <p style="margin-top: 4px; color: #9B2C2C; background: #FFF5F5; padding: 6px 8px; border-radius: 4px; border-left: 3px solid #E53E3E;">
+                                <strong>• Transit Safety Profile:</strong> Serves multiple major university and healthcare clusters (University of Colombo, National Hospital, Nursing schools). Results in high female student commuter ratios who frequently report unwelcome verbal and physical advances during transfer windows.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Route 187 -->
+                    <div style="background: #FAFAFA; border: 1px solid var(--border); border-radius: 8px; padding: 14px; border-top: 4px solid #F39C12;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <strong style="font-size: 1.05rem; color: #1A365D;">Route 187 (Katunayake Airport ↔ Colombo Fort)</strong>
+                            <span class="score-pill" style="background: #F39C12; color: white;">5.5 / 10 • Moderate</span>
+                        </div>
+                        <div style="font-size: 0.83rem; color: #4A5568; margin-bottom: 8px;"><strong>Corridor:</strong> Dedicated Airport Logistic Corridor</div>
+                        <div style="font-size: 0.82rem; line-height: 1.5; color: #2D3748;">
+                            <p><strong>• Operational Volume:</strong> Features <strong>75 normal permits</strong> (24,920 km), <strong>60 AC permits</strong> (5,760 km), and <strong>11 high-capacity AC permits</strong> generating 69,300 km.</p>
+                            <p style="margin-top: 4px; color: #7B341E; background: #FFFAF0; padding: 6px 8px; border-radius: 4px; border-left: 3px solid #DD6B20;">
+                                <strong>• Transit Safety Profile:</strong> Higher prevalence of AC fleet units with strict enforcement of passenger seating capacity eliminates standing aisle compression, mitigating physical harassment opportunities.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Route 177 -->
+                    <div style="background: #FAFAFA; border: 1px solid var(--border); border-radius: 8px; padding: 14px; border-top: 4px solid #E67E22;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <strong style="font-size: 1.05rem; color: #1A365D;">Route 177 (Kaduwela ↔ Kollupitiya)</strong>
+                            <span class="score-pill" style="background: #E67E22; color: white;">7.8 / 10 • Mod-High</span>
+                        </div>
+                        <div style="font-size: 0.83rem; color: #4A5568; margin-bottom: 8px;"><strong>Corridor:</strong> Battaramulla Administrative Capital Radial</div>
+                        <div style="font-size: 0.82rem; line-height: 1.5; color: #2D3748;">
+                            <p><strong>• Operational Volume:</strong> Operates <strong>49 normal permits</strong> (5,605 km) and <strong>32 AC permits</strong> (2,888 km).</p>
+                            <p style="margin-top: 4px; color: #7B341E; background: #FFFAF0; padding: 6px 8px; border-radius: 4px; border-left: 3px solid #DD6B20;">
+                                <strong>• Transit Safety Profile:</strong> Characterized by heavy office-commuter rush hour crowding between Malabe/Battaramulla ministries and Kollupitiya coastal terminus.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label>Trip Purpose / Route Type:</label>
-                <select id="logit-trip" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
-                    <option value="1">Work Trip on Municipal Bus (β = +1.331)</option>
-                    <option value="0">General Off-Peak / Non-commute Trip (Baseline)</option>
-                </select>
+            <!-- Section 3: Inter-Provincial Long-Distance Trunk Routes (NTC 2026 Tariff Table) -->
+            <div class="card col-12">
+                <div class="card-title">
+                    <span>3. Inter-Provincial Long-Distance Trunk Routes (National Transport Commission)</span>
+                    <span class="badge badge-safe">Published 2026 Tariff Schedules</span>
+                </div>
+                <div class="card-subtitle">Interprovincial corridors connecting provincial capitals and regional urban centers across Sri Lanka</div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Route No.</th>
+                                <th>Corridor Alignment</th>
+                                <th>Service Classes</th>
+                                <th>Published Fare (LKR 2026 Tariff)</th>
+                                <th>Safety & Risk Factors</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Route 1</strong></td>
+                                <td>Colombo Fort ↔ Kandy</td>
+                                <td>Normal, AC</td>
+                                <td>Normal: <strong>Rs. 521.00</strong><br>AC: <strong>Rs. 1,018.00</strong></td>
+                                <td><span class="badge badge-high">Moderate Risk</span> High frequency (10–15 min) reduces platform crowding, but long travel duration increases non-verbal harassment.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Route 2</strong></td>
+                                <td>Colombo Fort ↔ Matara</td>
+                                <td>Normal, Semi-Luxury, AC</td>
+                                <td>Normal: <strong>Rs. 681.00</strong><br>Semi-Lux: <strong>Rs. 1,022.00</strong><br>AC: <strong>Rs. 1,320.00</strong></td>
+                                <td><span class="badge badge-severe">Moderate to High</span> Heavy tourist and local transit overlap along the A2 highway corridor.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Route 87</strong></td>
+                                <td>Colombo ↔ Jaffna</td>
+                                <td>Normal, Semi-Luxury, AC</td>
+                                <td>Normal: <strong>Rs. 1,701.00</strong><br>Semi-Lux: <strong>Rs. 2,552.00</strong><br>AC: <strong>Rs. 3,256.00</strong></td>
+                                <td><span class="badge badge-extreme">High Duration Exposure</span> Overnight travel poses specific risks; dimmed interior lighting reported as a significant harassment risk factor.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Route 48</strong></td>
+                                <td>Colombo ↔ Kalmunai / Batticaloa</td>
+                                <td>Normal, Semi-Luxury, AC</td>
+                                <td>Normal: <strong>Rs. 1,509.00</strong><br>AC: <strong>Rs. 2,883.00</strong></td>
+                                <td><span class="badge badge-severe">Moderate to High</span> Extended transit duration across Eastern province corridors with remote stops.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Route 99</strong></td>
+                                <td>Colombo ↔ Badulla</td>
+                                <td>Normal, Semi-Luxury, AC</td>
+                                <td>Normal: <strong>Rs. 1,117.00</strong><br>AC: <strong>Rs. 2,131.00</strong></td>
+                                <td><span class="badge badge-high">Moderate Risk</span> Mountainous terrain leads to prolonged travel times and passenger fatigue.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label>Spatial / Urban Setting:</label>
-                <select id="logit-loc" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
-                    <option value="other">Small Urban / Unmonitored (Baseline = 0.000)</option>
-                    <option value="rajshahi">Rajshahi Urban Transit (β = -0.285)</option>
-                    <option value="dhaka">Dhaka Megacity with CCTV (β = -0.450)</option>
-                </select>
+            <!-- Section 4: Expressway Luxury Network & Multimodal Feeder Systems -->
+            <div class="card col-12" style="border-left: 6px solid #27AE60;">
+                <div class="card-title" style="color: #27AE60;">
+                    <span>4. Expressway Luxury Network & Multimodal Feeder Systems</span>
+                    <span class="score-pill" style="background: #27AE60; color: white;">2.5 – 3.5 / 10 • Low Risk</span>
+                </div>
+                <div class="card-subtitle">Safest public bus transit tier due to structural seating regulations and integrated CPTED terminal infrastructure</div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 10px;">
+                    <div style="background: #F0FFF4; border: 1px solid #C6F6D5; border-radius: 8px; padding: 12px;">
+                        <strong style="color: #22543D;">Expressway Trunk Tariffs (NTC Flat)</strong>
+                        <ul style="font-size: 0.82rem; margin-top: 6px; padding-left: 18px; line-height: 1.6; color: #2D3748;">
+                            <li><strong>EX01</strong> (Makumbura MMC ↔ Galle): <strong>Rs. 930.00</strong> (Luxury)</li>
+                            <li><strong>EX01-001</strong> (Makumbura MMC ↔ Matara): <strong>Rs. 1,170.00</strong> (Luxury)</li>
+                            <li><strong>EX02/EX04</strong> (Makumbura MMC ↔ Kandy): <strong>Rs. 1,210.00</strong> (Luxury)</li>
+                            <li><strong>EX 1-39</strong> (Makumbura MMC ↔ Tangalle): <strong>Rs. 1,410.00</strong> (Luxury)</li>
+                            <li><strong>EX 1-78</strong> (Makumbura MMC ↔ Akkaraipattu): <strong>Rs. 3,330.00</strong> (Super Lux)</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #F0FFF4; border: 1px solid #C6F6D5; border-radius: 8px; padding: 12px;">
+                        <strong style="color: #22543D;">Metrobus Multimodal Feeders</strong>
+                        <ul style="font-size: 0.82rem; margin-top: 6px; padding-left: 18px; line-height: 1.6; color: #2D3748;">
+                            <li><strong>CM01</strong>: Makumbura MMC ↔ Kadawatha via Expressway</li>
+                            <li><strong>CM02</strong>: Makumbura MMC ↔ Colombo Fort Terminal</li>
+                            <li>High frequency, automated scheduling, coordinated transfer bays</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #F0FFF4; border: 1px solid #C6F6D5; border-radius: 8px; padding: 12px;">
+                        <strong style="color: #22543D;">Safety Engineering Mechanism</strong>
+                        <p style="font-size: 0.82rem; margin-top: 6px; line-height: 1.5; color: #2D3748;">
+                            Physical harassment is significantly suppressed because expressway regulations <strong>strictly forbid standing passengers</strong> (guaranteeing individual seated comfort). Origin/destination hubs like <strong>Makumbura Multimodal Centre (MMC)</strong> feature 24/7 CCTV surveillance, solar platform lighting, regulated boarding bays, and dedicated transit staff oversight.
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <div style="background: #F7FAFC; padding: 18px; border-radius: 8px; border: 1px solid #CBD5E0; margin-top: 15px; text-align: center;">
-                <div style="font-size: 0.9rem; color: #4A5568; font-weight: 600;">Calculated Utility Disutility (U) & Harassment Probability (P)</div>
-                <div id="logit-prob" style="font-size: 2.2rem; font-weight: 800; color: #C53030; margin: 6px 0;">98.0%</div>
-                <div id="logit-u" style="font-size: 0.9rem; color: #718096; font-family: monospace;">U_risk = +3.898 | P_nh = 2.0%</div>
+            <!-- Section 5: Quantitative Comparison Matrix: Top Western Province Routes Table -->
+            <div class="card col-12">
+                <div class="card-title">
+                    <span>5. Quantitative Comparison Matrix: Top Western Province Routes</span>
+                    <span class="badge badge-extreme">Comprehensive Corridor Benchmarks</span>
+                </div>
+                <div class="card-subtitle">Contrasting operational permits, daily running kilometers, dominant service types, and empirical harassment risk levels</div>
+
+                <div style="overflow-x: auto;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Route No.</th>
+                                <th>Route Alignment</th>
+                                <th>Operating Office</th>
+                                <th>Valid Permits</th>
+                                <th>Daily Running (Km)</th>
+                                <th>Dominant Service Type</th>
+                                <th>Relative Harassment Risk Level</th>
+                                <th>Primary Risk Driver</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>100</strong></td>
+                                <td>Panadura – Colombo</td>
+                                <td>Colombo / Kalutara</td>
+                                <td><strong>97</strong></td>
+                                <td><strong>49,921.2</strong></td>
+                                <td>Normal</td>
+                                <td><span class="score-pill" style="background:#900C3F; color:white;">Very High (9.0)</span></td>
+                                <td>Extreme peak standing density & coastal corridor anonymity</td>
+                            </tr>
+                            <tr>
+                                <td><strong>120</strong></td>
+                                <td>Horana – Pettah</td>
+                                <td>Colombo / Kalutara</td>
+                                <td><strong>51</strong></td>
+                                <td><strong>49,364.0</strong></td>
+                                <td>Normal / AC</td>
+                                <td><span class="score-pill" style="background:#D35400; color:white;">High (8.2)</span></td>
+                                <td>Long commute distance (>40 km) & mixed seating layout exposure</td>
+                            </tr>
+                            <tr>
+                                <td><strong>240</strong></td>
+                                <td>Negombo – Colombo</td>
+                                <td>Colombo / Gampaha</td>
+                                <td><strong>77</strong></td>
+                                <td><strong>43,681.2</strong></td>
+                                <td>Normal / AC</td>
+                                <td><span class="score-pill" style="background:#C0392B; color:white;">High (8.0)</span></td>
+                                <td>Industrial and airport worker shift rush hour congestion</td>
+                            </tr>
+                            <tr>
+                                <td><strong>430</strong></td>
+                                <td>Mathugama – Colombo</td>
+                                <td>Kalutara</td>
+                                <td><strong>47 (AC)</strong></td>
+                                <td><strong>42,499.2</strong></td>
+                                <td>AC Luxury</td>
+                                <td><span class="score-pill" style="background:#E67E22; color:white;">Moderate (6.5)</span></td>
+                                <td>Sealed AC carriage crowding over long 66.7 km route</td>
+                            </tr>
+                            <tr>
+                                <td><strong>122</strong></td>
+                                <td>Avissawella – Pettah</td>
+                                <td>Colombo</td>
+                                <td><strong>63</strong></td>
+                                <td><strong>41,061.6</strong></td>
+                                <td>Normal</td>
+                                <td><span class="score-pill" style="background:#C0392B; color:white;">High (8.5)</span></td>
+                                <td>Mixed rural-urban passenger load & late-night return vulnerability</td>
+                            </tr>
+                            <tr>
+                                <td><strong>138</strong></td>
+                                <td>Homagama – Pettah</td>
+                                <td>Colombo</td>
+                                <td><strong>78</strong></td>
+                                <td><strong>13,600.0</strong></td>
+                                <td>Normal</td>
+                                <td><span class="score-pill" style="background:#721C24; color:white;">Critical (9.2)</span></td>
+                                <td>Highest intra-urban crush density (70.3%–85% crowding enabler)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>154</strong></td>
+                                <td>Kiribathgoda – Angulana</td>
+                                <td>Colombo / Gampaha</td>
+                                <td><strong>72</strong></td>
+                                <td><strong>10,641.0</strong></td>
+                                <td>Normal</td>
+                                <td><span class="score-pill" style="background:#C0392B; color:white;">High (8.8)</span></td>
+                                <td>Cross-town student commuter mix (University & hospital clusters)</td>
+                            </tr>
+                            <tr style="border-top: 3px solid #28A745; background: #F0FFF4;">
+                                <td><strong>CM01</strong></td>
+                                <td>MMC – Kadawatha</td>
+                                <td>Metrobus</td>
+                                <td>Scheduled</td>
+                                <td>N/A</td>
+                                <td>Expressway AC</td>
+                                <td><span class="score-pill" style="background:#28A745; color:white;">Low (2.8)</span></td>
+                                <td>Mandatory individual seating & 24/7 CCTV terminal hubs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
+    </div>
 
-        <!-- Interactive Model 2: Daily Incident Volume Simulator -->
-        <div class="card col-6">
-            <div class="card-title">2. Daily Harassment Incident Volume Model</div>
-            <div class="card-subtitle">N_incidents = V_daily × S_female × R_prevalence × C_density</div>
+    <!-- ========================================================================= -->
+    <!-- TAB: MATHEMATICAL MODELS & DEMOGRAPHICS                                   -->
+    <!-- ========================================================================= -->
+    <div id="tab-models" class="tab-section">
+        <div class="grid">
+            <!-- Model 1: Binary Logit Calculator -->
+            <div class="card col-6">
+                <div class="card-title">1. Binary Logit Harassment Probability</div>
+                <div class="card-subtitle">P_i^h = exp(U_i^h) / [exp(U_i^h) + exp(U_i^nh)] = 1 / (1 + e^-U_i^h)</div>
+                
+                <div class="control-group">
+                    <label>Gender Indicator:</label>
+                    <select id="logit-female" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
+                        <option value="1">Female (β = +3.703, t = 9.45)</option>
+                        <option value="0">Male (Reference baseline)</option>
+                    </select>
+                </div>
 
-            <div class="control-group">
-                <label>Daily Passenger Volume (V_daily):</label>
-                <div class="slider-wrapper">
-                    <input type="range" id="vol-slider" min="10000" max="200000" step="5000" value="85000" oninput="updateVolume()">
-                    <span class="slider-value" id="vol-val">85,000</span>
+                <div class="control-group">
+                    <label>Employment & Student Status:</label>
+                    <select id="logit-occup" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
+                        <option value="employed">Employed Commuter (β = +1.064, t = 3.25)</option>
+                        <option value="student">Student Commuter (β = +0.596, t = 1.87)</option>
+                        <option value="none">Neither / Off-Peak Traveler (Baseline)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Trip Purpose & Mode:</label>
+                    <select id="logit-trip" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
+                        <option value="1">Work Trip on Municipal Fixed-Route Bus (β = +1.331)</option>
+                        <option value="0">General Off-Peak / Non-Work Trip (Baseline)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>Spatial Urban Scale & Surveillance:</label>
+                    <select id="logit-loc" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border);" onchange="updateLogit()">
+                        <option value="other">Small Urban / Unmonitored Peripheral Hub (β = 0.000)</option>
+                        <option value="rajshahi">Rajshahi Urban Transit (β = -0.285)</option>
+                        <option value="dhaka">Dhaka Megacity with CCTV (β = -0.450)</option>
+                    </select>
+                </div>
+
+                <div style="background: #F7FAFC; padding: 18px; border-radius: 8px; border: 1px solid #CBD5E0; margin-top: 15px; text-align: center;">
+                    <div style="font-size: 0.85rem; color: #4A5568; font-weight: 700;">Calculated Utility Disutility (U) & Predicted Risk Probability (P)</div>
+                    <div id="logit-prob" style="font-size: 2.2rem; font-weight: 800; color: #C53030; margin: 6px 0;">98.0%</div>
+                    <div id="logit-u" style="font-size: 0.88rem; color: #718096; font-family: monospace;">U_risk = +3.898 | P_unharassed = 2.0%</div>
                 </div>
             </div>
 
-            <div class="control-group">
-                <label>Female Passenger Share (S_female):</label>
-                <div class="slider-wrapper">
-                    <input type="range" id="fem-slider" min="20" max="80" step="5" value="50" oninput="updateVolume()">
-                    <span class="slider-value" id="fem-val">50%</span>
+            <!-- Model 2: Daily Incident Volume Simulator -->
+            <div class="card col-6">
+                <div class="card-title">2. Expected Daily Incident Volume Model</div>
+                <div class="card-subtitle">N_incidents = V_daily × S_female × R_prevalence × C_density</div>
+
+                <div class="control-group">
+                    <label>Daily Passenger Volume (V_daily):</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="vol-slider" min="10000" max="200000" step="5000" value="85000" oninput="updateVolume()">
+                        <span class="slider-value" id="vol-val">85,000</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Female Passenger Share (S_female):</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="fem-slider" min="20" max="80" step="5" value="50" oninput="updateVolume()">
+                        <span class="slider-value" id="fem-val">50%</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Periodic Harassment Prevalence (R_prevalence):</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="prev-slider" min="10" max="95" step="5" value="45" oninput="updateVolume()">
+                        <span class="slider-value" id="prev-val">45%</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Crowding Density Exposure Factor (C_density):</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="crowd-slider" min="0.05" max="0.40" step="0.01" value="0.20" oninput="updateVolume()">
+                        <span class="slider-value" id="crowd-val">0.20</span>
+                    </div>
+                </div>
+
+                <div style="background: #F7FAFC; padding: 18px; border-radius: 8px; border: 1px solid #CBD5E0; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center;">
+                    <div>
+                        <div style="font-size: 0.75rem; text-transform: uppercase; color: #718096; font-weight: 700;">Daily Incidents</div>
+                        <div id="inc-daily" style="font-size: 1.45rem; font-weight: 800; color: #C53030;">~3,825</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; text-transform: uppercase; color: #718096; font-weight: 700;">Hourly Rate</div>
+                        <div id="inc-hourly" style="font-size: 1.45rem; font-weight: 800; color: #DD6B20;">212 / hr</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.75rem; text-transform: uppercase; color: #718096; font-weight: 700;">Minute Pace</div>
+                        <div id="inc-minute" style="font-size: 1.45rem; font-weight: 800; color: #2B6CB0;">3.5 / min</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="control-group">
-                <label>Prevalence Rate (R_prevalence):</label>
-                <div class="slider-wrapper">
-                    <input type="range" id="prev-slider" min="10" max="95" step="5" value="45" oninput="updateVolume()">
-                    <span class="slider-value" id="prev-val">45%</span>
+            <!-- Model 3: Coping Mechanism Probit -->
+            <div class="card col-6">
+                <div class="card-title">3. Ordered Probit Coping Mechanisms</div>
+                <div class="card-subtitle">U_ik* = α_k' X_i + ε_ik (α_female: night travel = +1.081, walk alone = +0.619)</div>
+                <div style="height: 320px;">
+                    <canvas id="copingChart"></canvas>
                 </div>
             </div>
 
-            <div class="control-group">
-                <label>Crowding Exposure Factor (C_density):</label>
-                <div class="slider-wrapper">
-                    <input type="range" id="crowd-slider" min="0.05" max="0.40" step="0.01" value="0.20" oninput="updateVolume()">
-                    <span class="slider-value" id="crowd-val">0.20</span>
+            <!-- Model 4: CPTED Regression -->
+            <div class="card col-6">
+                <div class="card-title">4. CPTED Infrastructure Safety Regression</div>
+                <div class="card-subtitle">y = -0.0004x + 0.6447 (R^2 = 0.0835) - Active lighting & sightlines vs crime counts</div>
+                <div style="height: 320px;">
+                    <canvas id="cptedChart"></canvas>
                 </div>
-            </div>
-
-            <div style="background: #F7FAFC; padding: 18px; border-radius: 8px; border: 1px solid #CBD5E0; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center;">
-                <div>
-                    <div style="font-size: 0.75rem; text-transform: uppercase; color: #718096; font-weight: 700;">Daily Incidents</div>
-                    <div id="inc-daily" style="font-size: 1.5rem; font-weight: 800; color: #C53030;">~3,825</div>
-                </div>
-                <div>
-                    <div style="font-size: 0.75rem; text-transform: uppercase; color: #718096; font-weight: 700;">Hourly Rate</div>
-                    <div id="inc-hourly" style="font-size: 1.5rem; font-weight: 800; color: #DD6B20;">212 / hr</div>
-                </div>
-                <div>
-                    <div style="font-size: 0.75rem; text-transform: uppercase; color: #718096; font-weight: 700;">Minute Pace</div>
-                    <div id="inc-minute" style="font-size: 1.5rem; font-weight: 800; color: #2B6CB0;">3.5 / min</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Global Prevalence vs Reporting Gap Chart -->
-        <div class="card col-6">
-            <div class="card-title">3. Global Harassment Prevalence vs Reporting Gap</div>
-            <div class="card-subtitle">Massive reporting silence observed across all transit jurisdictions</div>
-            <div style="height: 340px;">
-                <canvas id="globalChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Ordered Probit Coping Behavior Chart -->
-        <div class="card col-6">
-            <div class="card-title">4. Ordered Probit Coping Mechanisms</div>
-            <div class="card-subtitle">Behavioral adjustments adopted by commuters (α_female: night = +1.081, walk = +0.619)</div>
-            <div style="height: 340px;">
-                <canvas id="copingChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Corridor Risk Determinant Matrix -->
-        <div class="card col-12">
-            <div class="card-title">5. Route & Mode Risk Determinant Matrix (Corridor Heatmap)</div>
-            <div class="card-subtitle">Assessment of Sri Lankan & South Asian transit corridors across key criminogenic and CPTED metrics</div>
-            <div style="overflow-x: auto;">
-                <table class="heatmap-table">
-                    <thead>
-                        <tr>
-                            <th>Corridor / Route</th>
-                            <th>Transit Mode</th>
-                            <th>Vehicular Overcrowding<br><small>(70.3% Primary Enabler)</small></th>
-                            <th>Station Darkness<br><small>(CPTED Infrastructure Deficit)</small></th>
-                            <th>Trip Duration<br><small>(Perpetrator Proximity)</small></th>
-                            <th>Absence of Staff<br><small>(Lack of Intervention)</small></th>
-                            <th>Perceived Impunity<br><small>(Low Apprehension Risk)</small></th>
-                            <th>Overall Risk Score<br><small>(1.0 - 10.0)</small></th>
-                            <th>Classification</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="route-name">Route 138 (Homagama ↔ Pettah)</td>
-                            <td>Municipal Bus</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">9.8</td>
-                            <td style="background-color: #FCE8E6; font-weight: bold;">8.5</td>
-                            <td style="background-color: #FCE8E6; font-weight: bold;">8.2</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">9.2</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">9.5</td>
-                            <td><span class="score-pill" style="background:#721C24; color:white;">9.5</span></td>
-                            <td><span class="badge badge-extreme">Extreme Modal Risk</span></td>
-                        </tr>
-                        <tr>
-                            <td class="route-name">Route 100 (Panadura ↔ Pettah)</td>
-                            <td>Coastal Bus</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">9.4</td>
-                            <td style="background-color: #FCE8E6; font-weight: bold;">8.1</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">8.6</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">8.8</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">9.1</td>
-                            <td><span class="score-pill" style="background:#900C3F; color:white;">9.0</span></td>
-                            <td><span class="badge badge-severe">Severe Risk</span></td>
-                        </tr>
-                        <tr>
-                            <td class="route-name">Kelani Valley (KV) Line</td>
-                            <td>Commuter Rail</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">9.5</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">9.2</td>
-                            <td style="background-color: #FFF3CD; font-weight: bold;">7.8</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">8.5</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">8.9</td>
-                            <td><span class="score-pill" style="background:#C0392B; color:white;">8.8</span></td>
-                            <td><span class="badge badge-severe">Severe Risk</span></td>
-                        </tr>
-                        <tr>
-                            <td class="route-name">Coastal Railway Line</td>
-                            <td>Commuter Rail</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">9.1</td>
-                            <td style="background-color: #FFF3CD; font-weight: bold;">7.9</td>
-                            <td style="background-color: #FCE8E6; font-weight: bold;">8.4</td>
-                            <td style="background-color: #FCE8E6; font-weight: bold;">8.2</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">8.6</td>
-                            <td><span class="score-pill" style="background:#D9534F; color:white;">8.5</span></td>
-                            <td><span class="badge badge-high">High Risk</span></td>
-                        </tr>
-                        <tr>
-                            <td class="route-name">Northern Railway (Colombo ↔ Jaffna)</td>
-                            <td>Intercity Rail</td>
-                            <td style="background-color: #FFF3CD; font-weight: bold;">6.0</td>
-                            <td style="background-color: #FFF3CD; font-weight: bold;">6.5</td>
-                            <td style="background-color: #F8D7DA; font-weight: bold;">9.5</td>
-                            <td style="background-color: #FFF3CD; font-weight: bold;">6.8</td>
-                            <td style="background-color: #FFF3CD; font-weight: bold;">7.4</td>
-                            <td><span class="score-pill" style="background:#E67E22; color:white;">7.2</span></td>
-                            <td><span class="badge badge-high">Duration-Driven Risk</span></td>
-                        </tr>
-                        <tr style="border-top: 3px solid #28A745;">
-                            <td class="route-name">Expressway CM01 Metrobus</td>
-                            <td>Expressway Bus</td>
-                            <td style="background-color: #D4EDDA; font-weight: bold;">3.2</td>
-                            <td style="background-color: #D4EDDA; font-weight: bold;">3.5</td>
-                            <td style="background-color: #E2E3E5; font-weight: bold;">4.5</td>
-                            <td style="background-color: #E2E3E5; font-weight: bold;">4.0</td>
-                            <td style="background-color: #D4EDDA; font-weight: bold;">3.8</td>
-                            <td><span class="score-pill" style="background:#28A745; color:white;">3.8</span></td>
-                            <td><span class="badge badge-safe">Mitigated Corridor</span></td>
-                        </tr>
-                        <tr>
-                            <td class="route-name">Makumbura Multimodal Centre (MMC)</td>
-                            <td>Integrated Hub</td>
-                            <td style="background-color: #D4EDDA; font-weight: bold;">3.5</td>
-                            <td style="background-color: #C3E6CB; font-weight: bold;">2.2</td>
-                            <td style="background-color: #C3E6CB; font-weight: bold;">2.8</td>
-                            <td style="background-color: #C3E6CB; font-weight: bold;">2.5</td>
-                            <td style="background-color: #C3E6CB; font-weight: bold;">2.9</td>
-                            <td><span class="score-pill" style="background:#1E8449; color:white;">3.2</span></td>
-                            <td><span class="badge badge-safe">Safe Engineered Hub</span></td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
 
+    <!-- ========================================================================= -->
+    <!-- TAB 3: CORRIDOR HEATMAP & REPORTING SILENCE                               -->
+    <!-- ========================================================================= -->
+    <div id="tab-corridors" class="tab-section">
+        <div class="grid">
+            <!-- Global Reporting Gap -->
+            <div class="card col-12">
+                <div class="card-title">Global & Regional Transit Harassment vs. The Reporting Silence Gap</div>
+                <div class="card-subtitle">Empirical lifetime prevalence vs formal police complaints filed (UNFPA & International Transport Studies)</div>
+                <div style="height: 340px;">
+                    <canvas id="globalChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Route Determinant Matrix Table -->
+            <div class="card col-12">
+                <div class="card-title">Route & Mode Risk Determinant Matrix (Corridor Heatmap)</div>
+                <div class="card-subtitle">Evaluated across Sri Lankan and South Asian commuter corridors</div>
+                <div style="overflow-x: auto;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Corridor / Route</th>
+                                <th>Transit Mode</th>
+                                <th>Vehicular Overcrowding<br><small>(70.3% Primary Enabler)</small></th>
+                                <th>Station Darkness<br><small>(CPTED Deficit)</small></th>
+                                <th>Trip Duration<br><small>(Prolonged Proximity)</small></th>
+                                <th>Absence of Staff<br><small>(Unmonitored)</small></th>
+                                <th>Perceived Impunity<br><small>(Low Apprehension)</small></th>
+                                <th>Overall Risk Score<br><small>(1.0 - 10.0)</small></th>
+                                <th>Classification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Route 138 (Homagama ↔ Pettah)</strong></td>
+                                <td>Municipal Bus</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">9.8</td>
+                                <td style="background-color: #FCE8E6; font-weight: bold;">8.5</td>
+                                <td style="background-color: #FCE8E6; font-weight: bold;">8.2</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">9.2</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">9.5</td>
+                                <td><span class="score-pill" style="background:#721C24; color:white;">9.5</span></td>
+                                <td><span class="badge badge-extreme">Extreme Modal Risk</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Route 100 (Panadura ↔ Pettah)</strong></td>
+                                <td>Coastal Bus</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">9.4</td>
+                                <td style="background-color: #FCE8E6; font-weight: bold;">8.1</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">8.6</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">8.8</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">9.1</td>
+                                <td><span class="score-pill" style="background:#900C3F; color:white;">9.0</span></td>
+                                <td><span class="badge badge-severe">Severe Risk</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Kelani Valley (KV) Line</strong></td>
+                                <td>Commuter Rail</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">9.5</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">9.2</td>
+                                <td style="background-color: #FFF3CD; font-weight: bold;">7.8</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">8.5</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">8.9</td>
+                                <td><span class="score-pill" style="background:#C0392B; color:white;">8.8</span></td>
+                                <td><span class="badge badge-severe">Severe Risk</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Coastal Railway Line</strong></td>
+                                <td>Commuter Rail</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">9.1</td>
+                                <td style="background-color: #FFF3CD; font-weight: bold;">7.9</td>
+                                <td style="background-color: #FCE8E6; font-weight: bold;">8.4</td>
+                                <td style="background-color: #FCE8E6; font-weight: bold;">8.2</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">8.6</td>
+                                <td><span class="score-pill" style="background:#D9534F; color:white;">8.5</span></td>
+                                <td><span class="badge badge-high">High Risk</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Northern Railway (Colombo ↔ Jaffna)</strong></td>
+                                <td>Intercity Rail</td>
+                                <td style="background-color: #FFF3CD; font-weight: bold;">6.0</td>
+                                <td style="background-color: #FFF3CD; font-weight: bold;">6.5</td>
+                                <td style="background-color: #F8D7DA; font-weight: bold;">9.5</td>
+                                <td style="background-color: #FFF3CD; font-weight: bold;">6.8</td>
+                                <td style="background-color: #FFF3CD; font-weight: bold;">7.4</td>
+                                <td><span class="score-pill" style="background:#E67E22; color:white;">7.2</span></td>
+                                <td><span class="badge badge-high">Duration-Driven Risk</span></td>
+                            </tr>
+                            <tr style="border-top: 3px solid #28A745;">
+                                <td><strong>Expressway CM01 Metrobus</strong></td>
+                                <td>Expressway Bus</td>
+                                <td style="background-color: #D4EDDA; font-weight: bold;">3.2</td>
+                                <td style="background-color: #D4EDDA; font-weight: bold;">3.5</td>
+                                <td style="background-color: #E2E3E5; font-weight: bold;">4.5</td>
+                                <td style="background-color: #E2E3E5; font-weight: bold;">4.0</td>
+                                <td style="background-color: #D4EDDA; font-weight: bold;">3.8</td>
+                                <td><span class="score-pill" style="background:#28A745; color:white;">3.8</span></td>
+                                <td><span class="badge badge-safe">Mitigated Corridor</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Makumbura Multimodal Centre (MMC)</strong></td>
+                                <td>Integrated Hub</td>
+                                <td style="background-color: #D4EDDA; font-weight: bold;">3.5</td>
+                                <td style="background-color: #C3E6CB; font-weight: bold;">2.2</td>
+                                <td style="background-color: #C3E6CB; font-weight: bold;">2.8</td>
+                                <td style="background-color: #C3E6CB; font-weight: bold;">2.5</td>
+                                <td style="background-color: #C3E6CB; font-weight: bold;">2.9</td>
+                                <td><span class="score-pill" style="background:#1E8449; color:white;">3.2</span></td>
+                                <td><span class="badge badge-safe">Safe Engineered Hub</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- TAB 4: FLEET CAPACITY & OPERATIONAL DEFICITS                              -->
+    <!-- ========================================================================= -->
+    <div id="tab-operations" class="tab-section">
+        <div class="grid">
+            <!-- Regional Office Jurisdictions -->
+            <div class="card col-6">
+                <div class="card-title">1. Regional Office Jurisdictions & Regulatory Permits</div>
+                <div class="card-subtitle">Total Valid Permits Administered: 5,355 across 7 Western Province offices</div>
+                <div style="height: 280px;">
+                    <canvas id="jurisdictionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Fleet Seating Tiers -->
+            <div class="card col-6">
+                <div class="card-title">2. Fleet Seating Capacity Distribution</div>
+                <div class="card-subtitle">Distribution across the 4 provincial capacity tiers</div>
+                <div style="height: 280px;">
+                    <canvas id="seatingChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Route Fulfillment & Deficit Table -->
+            <div class="card col-12">
+                <div class="card-title">3. Route Operational Fulfillment Rates & Permit Deficits</div>
+                <div class="card-subtitle">Contrasting active daily operating buses against valid permits issued</div>
+                <div style="overflow-x: auto;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Route Number & Description</th>
+                                <th>Service Tier</th>
+                                <th>Valid Permits</th>
+                                <th>Daily Operating Fleet</th>
+                                <th>Operational Fulfillment (%)</th>
+                                <th>Dormant Permits</th>
+                                <th>Status / Deficit Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Route 100 (Panadura – Colombo)</td>
+                                <td>Normal</td>
+                                <td>97</td>
+                                <td>86</td>
+                                <td style="font-weight: 800; color: #2E7D32;">88.66%</td>
+                                <td>11</td>
+                                <td><span class="badge badge-safe">High Fulfillment</span></td>
+                            </tr>
+                            <tr>
+                                <td>Route 103 (Narahenpita – Fort)</td>
+                                <td>Normal</td>
+                                <td>76</td>
+                                <td>64</td>
+                                <td style="font-weight: 800; color: #2E7D32;">84.21%</td>
+                                <td>12</td>
+                                <td><span class="badge badge-safe">High Fulfillment (63,811 km/day)</span></td>
+                            </tr>
+                            <tr>
+                                <td>Route 122 (Avissawella – Pettah)</td>
+                                <td>Normal</td>
+                                <td>63</td>
+                                <td>55</td>
+                                <td style="font-weight: 800; color: #2E7D32;">87.30%</td>
+                                <td>8</td>
+                                <td><span class="badge badge-safe">Stable Arterial</span></td>
+                            </tr>
+                            <tr>
+                                <td>Route 138 (Homagama – Pettah)</td>
+                                <td>Normal</td>
+                                <td>78</td>
+                                <td>68</td>
+                                <td style="font-weight: 800; color: #2E7D32;">87.18%</td>
+                                <td>10</td>
+                                <td><span class="badge badge-safe">Core Urban Line</span></td>
+                            </tr>
+                            <tr>
+                                <td>Route 430 (Mathugama – Colombo)</td>
+                                <td>Normal</td>
+                                <td>48</td>
+                                <td>42</td>
+                                <td style="font-weight: 800; color: #2E7D32;">87.50%</td>
+                                <td>6</td>
+                                <td><span class="badge badge-safe">Stable Long-Distance</span></td>
+                            </tr>
+                            <tr>
+                                <td>Route 120 (Horana – Pettah)</td>
+                                <td>Normal</td>
+                                <td>51</td>
+                                <td>36</td>
+                                <td style="font-weight: 800; color: #DD6B20;">70.59%</td>
+                                <td>15</td>
+                                <td><span class="badge badge-high">Moderate Deficit</span></td>
+                            </tr>
+                            <tr>
+                                <td>Route 180 (Nittambuwa – Pettah)</td>
+                                <td>Normal</td>
+                                <td>50</td>
+                                <td>34</td>
+                                <td style="font-weight: 800; color: #DD6B20;">68.00%</td>
+                                <td>16</td>
+                                <td><span class="badge badge-high">Moderate Deficit</span></td>
+                            </tr>
+                            <tr>
+                                <td>Route 200 (Gampaha – Pettah)</td>
+                                <td>Normal</td>
+                                <td>64</td>
+                                <td>43</td>
+                                <td style="font-weight: 800; color: #DD6B20;">67.19%</td>
+                                <td>21</td>
+                                <td><span class="badge badge-high">Moderate Deficit</span></td>
+                            </tr>
+                            <tr>
+                                <td>Route 400 (Aluthgama – Pettah)</td>
+                                <td>A/C Express</td>
+                                <td>32</td>
+                                <td>21</td>
+                                <td style="font-weight: 800; color: #DD6B20;">65.63%</td>
+                                <td>11</td>
+                                <td><span class="badge badge-severe">A/C Shortfall</span></td>
+                            </tr>
+                            <tr style="background: #FFF5F5;">
+                                <td><strong>Route 187 (Airport – Fort)</strong></td>
+                                <td>A/C (Gampaha-01)</td>
+                                <td>60</td>
+                                <td>31</td>
+                                <td style="font-weight: 800; color: #C53030;">51.67%</td>
+                                <td>29</td>
+                                <td><span class="badge badge-extreme">Severe Deficit</span></td>
+                            </tr>
+                            <tr style="background: #FFF5F5;">
+                                <td><strong>Route 240 (Negombo – Colombo)</strong></td>
+                                <td>Normal</td>
+                                <td>77</td>
+                                <td>38</td>
+                                <td style="font-weight: 800; color: #C53030;">49.35%</td>
+                                <td>39</td>
+                                <td><span class="badge badge-extreme">Critical Deficit (39 Dormant)</span></td>
+                            </tr>
+                            <tr style="background: #FFF5F5;">
+                                <td><strong>Route 187 (Airport – Fort)</strong></td>
+                                <td>Normal</td>
+                                <td>75</td>
+                                <td>34</td>
+                                <td style="font-weight: 800; color: #C53030;">45.33%</td>
+                                <td>41</td>
+                                <td><span class="badge badge-extreme">Critical Deficit (41 Dormant)</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Landmark SLTB Reform Box -->
+            <div class="card col-12" style="border-left: 6px solid #2B6CB0; background: #F8FAFC;">
+                <div class="card-title" style="color: #2B6CB0;">
+                    <span>👩‍✈️ Landmark Workforce Inclusion: SLTB Female Conductors (Feb 6, 2026)</span>
+                    <span class="badge badge-safe">Structural Reform Milestone</span>
+                </div>
+                <div style="font-size: 0.92rem; color: #4A5568; line-height: 1.6; margin-top: 8px;">
+                    <p>On <strong>February 6, 2026</strong>, the Sri Lanka Transport Board (SLTB) inducted <strong>19 female conductors</strong> into permanent service at the <strong>Makumbura Multimodal Transport Center (MMC)</strong> under the leadership of Minister of Transport Bimal Ratnayake, Deputy Minister Kaushalya Ariyaratne, and SLTB Chairman Sajeewa Kanagaratne.</p>
+                    <div style="margin-top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+                        <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                            <strong>Crew Pairing Safety</strong>
+                            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">Pairing female conductors with female drivers to mitigate onboard intimidation and physical crew friction.</p>
+                        </div>
+                        <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                            <strong>Corridor Deployment</strong>
+                            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">Primary assignment on regulated expressway A/C lines (e.g., CM01 Metrobus) while phasing into high-density urban buses.</p>
+                        </div>
+                        <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                            <strong>Cashless Automation</strong>
+                            <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">Transitioning from manual cash bag handling to cashless smartcard entry, eliminating open rear-door hazards.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- SIMULATOR ENGINE JAVASCRIPT LOGIC                                         -->
+    <!-- ========================================================================= -->
     <script>
-        // Logit Calculation
+        // Tab switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // --- SIMULATOR STATE ---
+        const SIM_STATE = {
+            isRunning: true,
+            isRealWorldMode: true, // Synced to Real-World Colombo Clock (Asia/Colombo)
+            audioEnabled: true,
+            simTimeSeconds: 11 * 3600 + 45 * 60, // Fallback start
+            startSeconds: 5 * 3600,              // 05:00 AM
+            endSeconds: 23 * 3600,              // 11:00 PM (18 operating hours)
+            totalIncidentsToday: 0,
+            unreportedCount: 0,
+            reportedCount: 0,
+            crowdingCount: 0,
+            recentEvents: [],
+            lastTickTime: performance.now(),
+            audioCtx: null,
+            weather: {
+                temp: 31.1,
+                humidity: 61,
+                precipitation: 0.0,
+                wind: 6.9,
+                isMonsoonActive: false,
+                isNightStressActive: false,
+                lastUpdated: null
+            }
+        };
+
+        // Realistic Corridor Definitions
+        const CORRIDORS = [
+            { id: "R138", name: "Route 138 (Homagama ↔ Pettah)", mode: "High Level Trunk", riskWeight: 0.20, baselineIncidents: 0, currentHits: 0, lastLocation: "Nugegoda / Kirulapone" },
+            { id: "R100", name: "Route 100 (Panadura ↔ Pettah)", mode: "Galle Road Coastal", riskWeight: 0.17, baselineIncidents: 0, currentHits: 0, lastLocation: "Moratuwa / Wellawatte" },
+            { id: "R154", name: "Route 154 (Kiribathgoda ↔ Angulana)", mode: "Orbital Student/Hosp", riskWeight: 0.15, baselineIncidents: 0, currentHits: 0, lastLocation: "Borella / Kelaniya Univ" },
+            { id: "R122", name: "Route 122 (Avissawella ↔ Pettah)", mode: "Low Level Semi-Express", riskWeight: 0.11, baselineIncidents: 0, currentHits: 0, lastLocation: "Kaluaggala / Hanwella" },
+            { id: "R120", name: "Route 120 (Horana ↔ Pettah)", mode: "Horana Commuter", riskWeight: 0.09, baselineIncidents: 0, currentHits: 0, lastLocation: "Piliyandala / Bokundara" },
+            { id: "KV_RAIL", name: "Kelani Valley (KV) Commuter Line", mode: "Commuter Rail", riskWeight: 0.09, baselineIncidents: 0, currentHits: 0, lastLocation: "Maharagama Halt Platform" },
+            { id: "COAST_RAIL", name: "Coastal Railway Line", mode: "Commuter Rail", riskWeight: 0.07, baselineIncidents: 0, currentHits: 0, lastLocation: "Dehiwala / Bambalapitiya" },
+            { id: "R177", name: "Route 177 (Kaduwela ↔ Kollupitiya)", mode: "Tech & Campus Trunk", riskWeight: 0.05, baselineIncidents: 0, currentHits: 0, lastLocation: "Battaramulla / SLIIT Hub" },
+            { id: "R240", name: "Route 240 (Negombo ↔ Colombo)", mode: "Northern Arterial", riskWeight: 0.04, baselineIncidents: 0, currentHits: 0, lastLocation: "Wattala / Mabole" },
+            { id: "MMC_EXPRESS", name: "MMC & CM01 Expressway Metrobus", mode: "Mitigated Hub", riskWeight: 0.03, baselineIncidents: 0, currentHits: 0, lastLocation: "Makumbura Terminal Bay 4" }
+        ];
+
+        // Probable Situational & Environmental Drivers Library
+        const PROBABLE_REASONS = [
+            {
+                cause: "Standee Crush Overcrowding (>6.5 pers/m²)",
+                detail: "Overloading beyond 160% capacity strips physical clearance; enables non-consensual contact under guise of involuntary pressure.",
+                riskTier: "Primary Physical Catalyst"
+            },
+            {
+                cause: "Driver Hard Braking & Acceleration Inertia Jerk",
+                detail: "Aggressive throttle surge and abrupt braking weaponized by offender as pretext for falling onto passenger.",
+                riskTier: "Mechanical / Operational Trigger"
+            },
+            {
+                cause: "CPTED Darkness Deficit at Unlit Bus Halt (<10 lux)",
+                detail: "Absent municipal lighting and broken shelters eliminate natural surveillance, fostering predatory stalking.",
+                riskTier: "Infrastructure Deficit"
+            },
+            {
+                cause: "Monsoon Downpour: Shut Windows & Heavy Fogging",
+                detail: "Closed sliding windows and condensation create complete exterior invisibility, trapping commuters in humid cabin.",
+                riskTier: "Environmental / Weather Catalyst"
+            },
+            {
+                cause: "Conductor Absenteeism & Crew Indifference",
+                detail: "Private bus crew prioritizes cash intake; conductor instructs packed standees to 'squeeze further back' rather than intervening.",
+                riskTier: "Regulatory / Enforcement Failure"
+            },
+            {
+                cause: "Substandard 2x3 Vehicle Ergonomics (<45 cm Aisle)",
+                detail: "Over-configured seat rows leave claustrophobic aisle clearance, forcing continuous bodily friction.",
+                riskTier: "Vehicle Ergonomic Defect"
+            },
+            {
+                cause: "Rear Exit Doorway Lingering Bottleneck",
+                detail: "Perpetrator deliberately blocks egress steps to physically brush against passengers during boarding/alighting.",
+                riskTier: "Spatial Bottleneck Tactic"
+            },
+            {
+                cause: "Lack of Dedicated Female Seating Partition",
+                detail: "No barrier separating priority seating from standing aisle, allowing standees to loom over seated female commuters.",
+                riskTier: "Policy / Design Deficit"
+            }
+        ];
+
+        // Granular Incident Nature Library
+        const INCIDENT_TYPES = [
+            { 
+                type: "Non-Consensual Physical Contact ('Jacking')", 
+                crowdingEnabler: true, 
+                severity: "High", 
+                category: "Physical Assault",
+                desc: "Perpetrator exploited crush standing room to press against female commuter",
+                penalCode: "Penal Code Sec. 345A",
+                probableCauseIndex: 0
+            },
+            { 
+                type: "Aisle Standee Groping during Braking Surge", 
+                crowdingEnabler: true, 
+                severity: "High", 
+                category: "Physical Assault",
+                desc: "Offender utilized bus deceleration inertia and hard driver braking as pretext for non-consensual groping",
+                penalCode: "Penal Code Sec. 345A",
+                probableCauseIndex: 1
+            },
+            { 
+                type: "Rear-Door Bottleneck Boarding Intimidation", 
+                crowdingEnabler: true, 
+                severity: "Medium", 
+                category: "Physical Blockade",
+                desc: "Perpetrator deliberately blocked narrow rear bus exit to force close physical contact with disembarking passengers",
+                penalCode: "Penal Code Sec. 345A / Public Nuisance",
+                probableCauseIndex: 6
+            },
+            { 
+                type: "Seat Partition Creep Groping", 
+                crowdingEnabler: false, 
+                severity: "High", 
+                category: "Physical Encroachment",
+                desc: "Offender reached through narrow seat gap from behind to touch seated female commuter",
+                penalCode: "Penal Code Sec. 345A",
+                probableCauseIndex: 7
+            },
+            { 
+                type: "Persistent Lewd Sexual Remarks & Catcalling", 
+                crowdingEnabler: false, 
+                severity: "Medium", 
+                category: "Verbal Harassment",
+                desc: "Offender directed continuous offensive sexual propositions and vulgar commentary at passenger",
+                penalCode: "Penal Code Sec. 345A (Verbal Clause)",
+                probableCauseIndex: 4
+            },
+            { 
+                type: "Last-Kilometer Stalking from Unlit Bus Halt", 
+                crowdingEnabler: false, 
+                severity: "Critical", 
+                category: "Stalking & Threat",
+                desc: "Offender followed passenger from unlit roadside shelter into darkened access by-lane after disembarking",
+                penalCode: "Penal Code Sec. 345B (Stalking)",
+                probableCauseIndex: 2
+            },
+            { 
+                type: "Indecent Exposure & Lewd Gestures", 
+                crowdingEnabler: false, 
+                severity: "High", 
+                category: "Public Indecency",
+                desc: "Perpetrator deliberately exposed genitalia or made sexually explicit physical gestures in passenger cabin",
+                penalCode: "Penal Code Sec. 365A / Sec. 345",
+                probableCauseIndex: 3
+            },
+            { 
+                type: "Non-Consensual Smartphone Filming / Upskirting", 
+                crowdingEnabler: true, 
+                severity: "Critical", 
+                category: "Digital Voyeurism",
+                desc: "Offender angled smartphone beneath victim's clothing while ascending crowded bus steps or platform stairwell",
+                penalCode: "Penal Code Sec. 345 / Computer Crimes",
+                probableCauseIndex: 0
+            },
+            { 
+                type: "Inappropriate Leaning & Forced Proximity", 
+                crowdingEnabler: true, 
+                severity: "Medium", 
+                category: "Space Infiltration",
+                desc: "Perpetrator persistently leaned whole upper torso over seated female passenger despite available space",
+                penalCode: "Transit Regulation Infraction",
+                probableCauseIndex: 5
+            },
+            { 
+                type: "Intoxicated Group Intimidation at Terminal", 
+                crowdingEnabler: false, 
+                severity: "High", 
+                category: "Intimidation",
+                desc: "Group of intoxicated individuals loitering at junction bus stop encircled commuter demanding contact info",
+                penalCode: "Public Drunkenness & Harassment",
+                probableCauseIndex: 2
+            },
+            { 
+                type: "Conductor Fare Collection Body Squeeze", 
+                crowdingEnabler: true, 
+                severity: "High", 
+                category: "Crew Abuse",
+                desc: "Private bus conductor inappropriately squeezed and brushed against passenger while collecting fares",
+                penalCode: "NTC Regulatory Breach / Sec. 345A",
+                probableCauseIndex: 4
+            },
+            { 
+                type: "Overcrowded Train Footbridge Bottleneck Stalking", 
+                crowdingEnabler: true, 
+                severity: "High", 
+                category: "Station Area Harassment",
+                desc: "Perpetrator cornered female commuter during bottleneck crowd surge on unlit railway pedestrian footbridge",
+                penalCode: "Railway Ordinance / Sec. 345A",
+                probableCauseIndex: 2
+            }
+        ];
+
+        // Reaction / Outcome Library (grounded in UNFPA 96% silence vs 4% report)
+        const OUTCOMES = [
+            { label: "Suffer in Silence (Trapped)", reported: false, icon: "🔇", desc: "Victim paralyzed by extreme crowd density; unable to move away (UNFPA 96% silence norm)." },
+            { label: "Crew Indifference / Inaction", reported: false, icon: "❌", desc: "Conductor shouted at passenger to squeeze backward to maintain door clearance." },
+            { label: "Forced Premature Exit", reported: false, icon: "🚶", desc: "Passenger disembarked 4 stops early in distress to escape offender." },
+            { label: "Bystander Passive Non-Intervention", reported: false, icon: "👀", desc: "Surrounding male commuters averted gaze; perpetrator exited unchallenged." },
+            { label: "Verbal Protest; Offender Slipped Away", reported: false, icon: "🗣️", desc: "Victim shouted in protest; harasser quickly stepped off vehicle into crowd." },
+            { label: "Defensive Bag Shielding", reported: false, icon: "🎒", desc: "Commuter repositioned backpack / handbag across chest as physical barrier." },
+            { label: "Female Passengers Formed Protective Buffer", reported: false, icon: "🤝", desc: "Nearby female commuters intervened and formed physical protective barrier around victim." },
+            { label: "Formal Police Complaint Lodged (Hotline 119)", reported: true, icon: "⚖️", desc: "Passenger contacted Police Women & Children's Desk / Hotline 119 (4% rare threshold)." },
+            { label: "Conductor Intervened / Removed Perpetrator", reported: false, icon: "🛡️", desc: "Crew intervened and removed harasser (trained SLTB / MMC terminal personnel)." }
+        ];
+
+        // Fetch Live Colombo Weather from Open-Meteo API
+        async function fetchLiveColomboWeather() {
+            const url = "https://api.open-meteo.com/v1/forecast?latitude=6.9271&longitude=79.8612&current=temperature_2m,relative_humidity_2m,precipitation,rain,weather_code,cloud_cover,wind_speed_10m&timezone=Asia%2FColombo";
+            const badge = document.getElementById('live-internet-badge');
+            try {
+                if (badge) badge.style.background = '#DD6B20';
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const data = await res.json();
+                const cur = data.current;
+
+                SIM_STATE.weather.temp = cur.temperature_2m;
+                SIM_STATE.weather.humidity = cur.relative_humidity_2m;
+                SIM_STATE.weather.precipitation = cur.precipitation;
+                SIM_STATE.weather.wind = cur.wind_speed_10m;
+                SIM_STATE.weather.lastUpdated = new Date();
+
+                if (badge) badge.style.background = '#38A169';
+                const stLabel = document.getElementById('live-station-label');
+                if (stLabel) stLabel.innerText = `Open-Meteo Live (${cur.time} Colombo)`;
+                updateWeatherUI();
+            } catch (err) {
+                console.warn("Live weather fetch error:", err);
+                if (badge) badge.style.background = '#3182CE';
+                updateWeatherUI();
+            }
+        }
+
+        function updateWeatherUI() {
+            const w = SIM_STATE.weather;
+            const tEl = document.getElementById('live-temp-val');
+            const hEl = document.getElementById('live-humid-val');
+            const rEl = document.getElementById('live-rain-val');
+            const rDesc = document.getElementById('live-rain-desc');
+            const sEl = document.getElementById('live-sun-val');
+            const sDesc = document.getElementById('live-sun-desc');
+
+            if (tEl) tEl.innerText = `${w.temp.toFixed(1)}°C`;
+            if (hEl) hEl.innerText = `${w.humidity}%`;
+
+            if (rEl) {
+                if (w.isMonsoonActive) {
+                    rEl.innerText = `25.0 mm 🌧️`;
+                    if (rDesc) rDesc.innerText = `Monsoon Cloudburst (Windows Shut, 160% Crush)`;
+                } else {
+                    rEl.innerText = `${w.precipitation.toFixed(1)} mm`;
+                    if (rDesc) rDesc.innerText = w.precipitation > 0 ? `Rain Falling` : `Normal Windows & Flow`;
+                }
+            }
+
+            const nowH = (SIM_STATE.simTimeSeconds / 3600);
+            if (sEl) {
+                if (w.isNightStressActive || nowH >= 18.25 || nowH < 5.75) {
+                    sEl.innerText = `🌙 Post-Dusk`;
+                    if (sDesc) sDesc.innerText = `CPTED Darkness Deficit Active (+35% Risk)`;
+                } else {
+                    sEl.innerText = `☀️ Daylight`;
+                    if (sDesc) sDesc.innerText = `Full Sightlines (Sunset ~18:05)`;
+                }
+            }
+
+            const sev = computeDynamicSeverity();
+            const sevEl = document.getElementById('live-sev-multiplier');
+            const sevNote = document.getElementById('live-sev-note');
+            if (sevEl) sevEl.innerText = `${sev.multiplier.toFixed(2)}x`;
+            if (sevNote) sevNote.innerText = sev.summary;
+        }
+
+        function computeDynamicSeverity() {
+            const w = SIM_STATE.weather;
+            const h = (SIM_STATE.simTimeSeconds / 3600);
+            const diurnal = getDiurnalFactor(SIM_STATE.simTimeSeconds);
+
+            let heatM = (w.temp >= 30.0 && w.humidity >= 60) ? 1.15 : 1.0;
+            let rainM = (w.precipitation > 0 || w.isMonsoonActive) ? 1.55 : 1.0;
+            let cptedM = (w.isNightStressActive || h >= 18.25 || h < 5.75) ? 1.40 : 1.0;
+
+            let totalM = diurnal.factor * heatM * rainM * cptedM;
+            let tags = [];
+            if (diurnal.isPeak) tags.push("Rush Surge");
+            if (heatM > 1.0) tags.push("Heat Stress");
+            if (rainM > 1.0) tags.push("Monsoon Crowding");
+            if (cptedM > 1.0) tags.push("Darkness Deficit");
+
+            return {
+                multiplier: totalM,
+                summary: tags.length ? tags.join(" + ") : "Normal Off-Peak",
+                heatM, rainM, cptedM, diurnal
+            };
+        }
+
+        function toggleRealWorldMode() {
+            SIM_STATE.isRealWorldMode = !SIM_STATE.isRealWorldMode;
+            const btn = document.getElementById('btn-mode-toggle');
+            const lbl = document.getElementById('sim-day-window-label');
+            if (SIM_STATE.isRealWorldMode) {
+                btn.innerText = "🌍 Mode: Real-World Colombo Clock";
+                btn.style.background = "#2B6CB0";
+                lbl.innerText = "Synced: Live Real-World Time (Asia/Colombo)";
+            } else {
+                btn.innerText = "⚡ Mode: Simulation Lab";
+                btn.style.background = "#4A5568";
+                lbl.innerText = "Free Simulation Mode (Scrub & Accelerate)";
+            }
+        }
+
+        function toggleStressMonsoon() {
+            SIM_STATE.weather.isMonsoonActive = !SIM_STATE.weather.isMonsoonActive;
+            const btn = document.getElementById('btn-stress-monsoon');
+            if (SIM_STATE.weather.isMonsoonActive) {
+                btn.style.background = "#3182CE";
+                btn.style.color = "white";
+                btn.innerText = "🌧️ Active: Monsoon Cloudburst (+25mm)";
+            } else {
+                btn.style.background = "#EBF8FF";
+                btn.style.color = "#2B6CB0";
+                btn.innerText = "🌧️ Simulate Monsoon Cloudburst (+25mm)";
+            }
+            updateWeatherUI();
+        }
+
+        function toggleStressNight() {
+            SIM_STATE.weather.isNightStressActive = !SIM_STATE.weather.isNightStressActive;
+            const btn = document.getElementById('btn-stress-darkness');
+            if (SIM_STATE.weather.isNightStressActive) {
+                btn.style.background = "#744210";
+                btn.style.color = "white";
+                btn.innerText = "🌙 Active: CPTED Blackout";
+            } else {
+                btn.style.background = "#FEFCBF";
+                btn.style.color = "#744210";
+                btn.innerText = "🌙 Simulate CPTED Post-Dusk Blackout";
+            }
+            updateWeatherUI();
+        }
+
+        // Audio synthesizer via Web Audio API
+        function playTickSound() {
+            if (!SIM_STATE.audioEnabled) return;
+            try {
+                if (!SIM_STATE.audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    SIM_STATE.audioCtx = new AudioContext();
+                }
+                if (SIM_STATE.audioCtx.state === 'suspended') {
+                    SIM_STATE.audioCtx.resume();
+                }
+                const osc = SIM_STATE.audioCtx.createOscillator();
+                const gain = SIM_STATE.audioCtx.createGain();
+                
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(880, SIM_STATE.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(440, SIM_STATE.audioCtx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.12, SIM_STATE.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, SIM_STATE.audioCtx.currentTime + 0.08);
+
+                osc.connect(gain);
+                gain.connect(SIM_STATE.audioCtx.destination);
+
+                osc.start();
+                osc.stop(SIM_STATE.audioCtx.currentTime + 0.08);
+            } catch (e) {
+                // Audio autoplay might be blocked until user interacts
+            }
+        }
+
+        function toggleAudio() {
+            SIM_STATE.audioEnabled = !SIM_STATE.audioEnabled;
+            const btn = document.getElementById('btn-audio-toggle');
+            btn.innerText = SIM_STATE.audioEnabled ? "🔊 Sound: ON" : "🔇 Sound: MUTED";
+            btn.style.color = SIM_STATE.audioEnabled ? "#2D3748" : "#E53E3E";
+        }
+
+        // Format Seconds to AM/PM Time
+        function formatSimTime(totalSecs) {
+            let h = Math.floor(totalSecs / 3600);
+            let m = Math.floor((totalSecs % 3600) / 60);
+            let s = Math.floor(totalSecs % 60);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12;
+            h = h ? h : 12;
+            const pad = (n) => n < 10 ? '0' + n : n;
+            return `${pad(h)}:${pad(m)}:${pad(s)} ${ampm}`;
+        }
+
+        // Get Diurnal Rush Hour Factor
+        function getDiurnalFactor(sec) {
+            const h = sec / 3600;
+            if (h >= 7.0 && h <= 9.5) return { factor: 2.2, label: "MORNING PEAK RUSH (2.2x Surge)", isPeak: true };
+            if (h >= 16.5 && h <= 19.5) return { factor: 2.0, label: "EVENING COMMUTE SURGE (2.0x Peak)", isPeak: true };
+            if (h >= 11.5 && h <= 14.0) return { factor: 1.15, label: "MIDDAY SCHOOL & OFFICE SHIFT (1.15x)", isPeak: false };
+            if (h >= 20.0) return { factor: 0.8, label: "NIGHT COMMUTE (0.8x / CPTED Deficit)", isPeak: false };
+            return { factor: 0.7, label: "OFF-PEAK TRANSIT (0.7x)", isPeak: false };
+        }
+
+        // Initialize Corridor UI Cards
+        function initCorridorCards() {
+            const container = document.getElementById('corridor-cards-container');
+            container.innerHTML = "";
+            CORRIDORS.forEach(c => {
+                const card = document.createElement('div');
+                card.className = "corridor-card";
+                card.id = `card-${c.id}`;
+                card.innerHTML = `
+                    <div class="corridor-name">${c.name}</div>
+                    <div class="corridor-meta">${c.mode} • Last: ${c.lastLocation}</div>
+                    <div class="corridor-stat-row">
+                        <span style="color: var(--text-muted);">Simulated Hits Today:</span>
+                        <span id="hits-${c.id}" style="color: #C53030; font-weight: 800;">0</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Render An Incident Tick Event
+        function triggerIncidentTick() {
+            SIM_STATE.totalIncidentsToday++;
+
+            // Select Corridor via Weighted Probability
+            const rand = Math.random();
+            let cumWeight = 0;
+            let selectedCorridor = CORRIDORS[0];
+            for (let c of CORRIDORS) {
+                cumWeight += c.riskWeight;
+                if (rand <= cumWeight) {
+                    selectedCorridor = c;
+                    break;
+                }
+            }
+            selectedCorridor.currentHits++;
+
+            // Select Incident Type
+            const incType = INCIDENT_TYPES[Math.floor(Math.random() * INCIDENT_TYPES.length)];
+            if (incType.crowdingEnabler) {
+                SIM_STATE.crowdingCount++;
+            }
+
+            // Select Outcome (4% chance of formal report, else silent/unreported)
+            let isReported = Math.random() < 0.04;
+            let outcome = null;
+            if (isReported) {
+                SIM_STATE.reportedCount++;
+                outcome = OUTCOMES.find(o => o.reported) || OUTCOMES[5];
+            } else {
+                SIM_STATE.unreportedCount++;
+                const nonReportedOutcomes = OUTCOMES.filter(o => !o.reported);
+                outcome = nonReportedOutcomes[Math.floor(Math.random() * nonReportedOutcomes.length)];
+            }
+
+            // Visual Tick Pulse Indicator
+            const dot = document.getElementById('live-dot-indicator');
+            if (dot) {
+                dot.classList.add('active-tick');
+                setTimeout(() => dot.classList.remove('active-tick'), 350);
+            }
+
+            // Corridor Card Flash
+            const cardEl = document.getElementById(`card-${selectedCorridor.id}`);
+            if (cardEl) {
+                cardEl.classList.add('corridor-alert');
+                const hitsEl = document.getElementById(`hits-${selectedCorridor.id}`);
+                if (hitsEl) hitsEl.innerText = selectedCorridor.currentHits;
+                setTimeout(() => cardEl.classList.remove('corridor-alert'), 600);
+            }
+
+            // Play synthesized audio tone
+            playTickSound();
+
+            // Environmental Context for Stream
+            const w = SIM_STATE.weather;
+            let envContext = "";
+            if (w.isMonsoonActive || w.precipitation > 0) {
+                envContext = "🌧️ Monsoon Cloudburst (Windows Shut, 160% Crush Load)";
+            } else if (w.isNightStressActive || (SIM_STATE.simTimeSeconds/3600 >= 18.25)) {
+                envContext = "🌙 Post-Dusk CPTED Darkness Deficit";
+            } else {
+                envContext = `🌡️ ${w.temp.toFixed(1)}°C Thermal Stress (${w.humidity}% RH)`;
+            }
+
+            // Prepend Event to Incident Stream
+            const stream = document.getElementById('incident-stream');
+            const eventItem = document.createElement('div');
+            eventItem.className = `incident-item ${isReported ? 'reported' : (selectedCorridor.id === 'MMC_EXPRESS' ? 'mitigated' : 'unreported')}`;
+            
+            const timeStr = formatSimTime(SIM_STATE.simTimeSeconds);
+            const incId = `#INC-${String(SIM_STATE.totalIncidentsToday).padStart(4, '0')}`;
+
+            // Match Probable Situational Cause
+            const causeObj = PROBABLE_REASONS[incType.probableCauseIndex !== undefined ? incType.probableCauseIndex : Math.floor(Math.random() * PROBABLE_REASONS.length)];
+
+            eventItem.innerHTML = `
+                <div class="incident-header">
+                    <span class="incident-id-time">${incId} • ${timeStr} • <span style="color:#C53030;">${envContext}</span></span>
+                    <span class="incident-route-badge">${selectedCorridor.name}</span>
+                </div>
+                <div class="incident-nature">⚠️ ${incType.type}</div>
+                <div class="incident-cause">
+                    <strong>🔍 Probable Reason:</strong> ${causeObj.cause}
+                    <div style="font-size:0.77rem; color:#744210; margin-top:2px;"><em>${causeObj.detail}</em> [${causeObj.riskTier}]</div>
+                </div>
+                <div class="incident-context">${incType.desc} near ${selectedCorridor.lastLocation}.</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
+                    <span class="incident-legal">⚖️ ${incType.penalCode}</span>
+                    <span style="font-size:0.75rem; color:#718096; font-weight:600;">Category: ${incType.category}</span>
+                </div>
+                <div class="incident-outcome">
+                    <span>${outcome.icon}</span>
+                    <span><strong>Commuter Reaction:</strong> ${outcome.label} — ${outcome.desc}</span>
+                </div>
+            `;
+
+            stream.prepend(eventItem);
+            
+            // Limit stream items in DOM to 40 for optimal performance
+            if (stream.children.length > 40) {
+                stream.removeChild(stream.lastChild);
+            }
+
+            // Update KPI Displays
+            document.getElementById('kpi-incidents-total').innerText = SIM_STATE.totalIncidentsToday.toLocaleString();
+            document.getElementById('kpi-unreported').innerText = SIM_STATE.unreportedCount.toLocaleString();
+            document.getElementById('kpi-crowding').innerText = SIM_STATE.crowdingCount.toLocaleString();
+            document.getElementById('kpi-reported').innerText = SIM_STATE.reportedCount.toLocaleString();
+        }
+
+        // Simulator Main Animation Loop (Continuously Locked to Real-Time Colombo Clock)
+        let tickAccumulator = 0;
+        function simulationLoop(timestamp) {
+            if (!SIM_STATE.isRunning) {
+                SIM_STATE.lastTickTime = timestamp;
+                requestAnimationFrame(simulationLoop);
+                return;
+            }
+
+            const deltaSeconds = (timestamp - SIM_STATE.lastTickTime) / 1000;
+            SIM_STATE.lastTickTime = timestamp;
+
+            // Continuously synchronized with Sri Lanka Standard Time (Asia/Colombo)
+            const nowColombo = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Colombo" }));
+            SIM_STATE.simTimeSeconds = nowColombo.getHours() * 3600 + nowColombo.getMinutes() * 60 + nowColombo.getSeconds();
+
+            // Update clock display
+            document.getElementById('sim-clock').innerText = formatSimTime(SIM_STATE.simTimeSeconds);
+            const sev = computeDynamicSeverity();
+            const tagEl = document.getElementById('sim-period-tag');
+            tagEl.innerText = `${sev.diurnal.label} [${sev.multiplier.toFixed(2)}x Dynamic Severity]`;
+            tagEl.className = `clock-period-tag ${sev.diurnal.isPeak || sev.multiplier > 1.5 ? 'peak' : ''}`;
+
+            // Steady, realistic real-time telemetry feed
+            // Dynamically pulses an incident every 5–8 seconds based on diurnal overcrowding factor
+            const baseRatePerSecond = 0.16;
+            const currentRatePerSecond = baseRatePerSecond * (sev.multiplier / 1.15);
+            tickAccumulator += currentRatePerSecond * deltaSeconds;
+
+            while (tickAccumulator >= 1.0) {
+                triggerIncidentTick();
+                tickAccumulator -= 1.0;
+            }
+
+            requestAnimationFrame(simulationLoop);
+        }
+
+        // Controls
+        function toggleSimulation() {
+            SIM_STATE.isRunning = !SIM_STATE.isRunning;
+            const btn = document.getElementById('btn-toggle-play');
+            const statusEl = document.getElementById('live-status-text');
+            if (SIM_STATE.isRunning) {
+                btn.innerHTML = "⏸️ Pause";
+                btn.className = "sim-btn sim-btn-pause";
+                statusEl.innerText = "SIMULATOR ACTIVE";
+                statusEl.style.color = "#FFFFFF";
+            } else {
+                btn.innerHTML = "▶️ Resume";
+                btn.className = "sim-btn sim-btn-play";
+                statusEl.innerText = "PAUSED";
+                statusEl.style.color = "#FBD38D";
+            }
+        }
+
+        function triggerManualTick() {
+            triggerIncidentTick();
+        }
+
+        function resetSimulation() {
+            SIM_STATE.simTimeSeconds = 11 * 3600 + 45 * 60;
+            SIM_STATE.totalIncidentsToday = 0;
+            SIM_STATE.unreportedCount = 0;
+            SIM_STATE.reportedCount = 0;
+            SIM_STATE.crowdingCount = 0;
+            tickAccumulator = 0;
+            CORRIDORS.forEach(c => {
+                c.currentHits = 0;
+                const hitsEl = document.getElementById(`hits-${c.id}`);
+                if (hitsEl) hitsEl.innerText = "0";
+            });
+            document.getElementById('incident-stream').innerHTML = "";
+            document.getElementById('kpi-incidents-total').innerText = "0";
+            document.getElementById('kpi-unreported').innerText = "0";
+            document.getElementById('kpi-crowding').innerText = "0";
+            document.getElementById('kpi-reported').innerText = "0";
+        }
+
+        // --- MATHEMATICAL MODELS LOGIC ---
         function updateLogit() {
             const female = parseFloat(document.getElementById('logit-female').value);
             const occup = document.getElementById('logit-occup').value;
@@ -483,7 +2250,6 @@
             document.getElementById('logit-u').innerText = `U_risk = ${u >= 0 ? '+' : ''}${u.toFixed(3)} | P_unharassed = ${((1-prob)*100).toFixed(1)}%`;
         }
 
-        // Daily Volume Calculation
         function updateVolume() {
             const v = parseFloat(document.getElementById('vol-slider').value);
             const s = parseFloat(document.getElementById('fem-slider').value) / 100;
@@ -504,9 +2270,13 @@
             document.getElementById('inc-minute').innerText = perMin + ' / min';
         }
 
-        // Initialize Charts
+        // Initialize All Charts on Load
         window.addEventListener('load', () => {
-            // Global Prevalence Chart
+            initCorridorCards();
+            updateLogit();
+            updateVolume();
+
+            // 1. Global Prevalence Chart
             const ctxGlobal = document.getElementById('globalChart').getContext('2d');
             new Chart(ctxGlobal, {
                 type: 'bar',
@@ -514,12 +2284,12 @@
                     labels: ['Sri Lanka', 'France', 'Chile', 'Colombia', 'Egypt', 'Nepal', 'Pakistan', 'Bangladesh'],
                     datasets: [
                         {
-                            label: 'Lifetime Harassment (%)',
+                            label: 'Lifetime Transit Harassment Prevalence (%)',
                             data: [90.0, 87.0, 85.0, 84.0, 83.0, 82.1, 78.0, 70.0],
                             backgroundColor: '#E53E3E'
                         },
                         {
-                            label: 'Formal Police Reporting (%)',
+                            label: 'Formal Police Reporting Rate (%)',
                             data: [8.0, 10.0, 7.0, 11.0, 2.0, 3.7, 5.0, 6.0],
                             backgroundColor: '#319795'
                         }
@@ -539,7 +2309,7 @@
                 }
             });
 
-            // Coping Behavior Chart
+            // 2. Coping Behavior Chart
             const ctxCoping = document.getElementById('copingChart').getContext('2d');
             new Chart(ctxCoping, {
                 type: 'bar',
@@ -574,8 +2344,103 @@
                 }
             });
 
-            updateLogit();
-            updateVolume();
+            // 3. CPTED Regression Chart
+            const ctxCpted = document.getElementById('cptedChart').getContext('2d');
+            const cptedPoints = [];
+            for (let x = 100; x <= 1400; x += 30) {
+                let yTrue = -0.0004 * x + 0.6447;
+                let noise = (Math.random() - 0.5) * 0.12;
+                cptedPoints.push({ x: x, y: Math.max(0.05, Math.min(0.9, yTrue + noise)) * 100 });
+            }
+            new Chart(ctxCpted, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Station Observations',
+                            data: cptedPoints,
+                            backgroundColor: 'rgba(49, 130, 206, 0.6)',
+                            borderColor: '#2B6CB0',
+                            pointRadius: 4
+                        },
+                        {
+                            type: 'line',
+                            label: 'Regression Line: y = -0.0004x + 0.6447 (R² = 0.0835)',
+                            data: [
+                                { x: 100, y: (-0.0004 * 100 + 0.6447) * 100 },
+                                { x: 1400, y: (-0.0004 * 1400 + 0.6447) * 100 }
+                            ],
+                            borderColor: '#C53030',
+                            borderWidth: 2.5,
+                            fill: false,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Station Crime Counts (x)' } },
+                        y: {
+                            title: { display: true, text: 'Active CPTED Safety Elements (%)' },
+                            ticks: { callback: v => v + '%' }
+                        }
+                    }
+                }
+            });
+
+            // 4. Regional Office Jurisdiction Chart
+            const ctxJuris = document.getElementById('jurisdictionChart').getContext('2d');
+            new Chart(ctxJuris, {
+                type: 'bar',
+                data: {
+                    labels: ['Colombo-01', 'Colombo-02', 'Colombo-03', 'Colombo-04', 'Gampaha-01', 'Gampaha-02', 'Kalutara'],
+                    datasets: [{
+                        label: 'Valid Permits Administered',
+                        data: [1284, 896, 612, 548, 582, 745, 688],
+                        backgroundColor: '#2B6CB0',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: 'Valid Permits' } }
+                    }
+                }
+            });
+
+            // 5. Fleet Seating Tiers Chart
+            const ctxSeating = document.getElementById('seatingChart').getContext('2d');
+            new Chart(ctxSeating, {
+                type: 'doughnut',
+                data: {
+                    labels: ['40–49 Seats (Suburban Backbone)', '50–60 Seats (High-Capacity)', '30–39 Seats (Mid-Capacity)', '20–29 Seats (A/C & Feeders)'],
+                    datasets: [{
+                        data: [1854, 1042, 486, 368],
+                        backgroundColor: ['#2B6CB0', '#1A365D', '#D69E2E', '#E53E3E']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+
+            // Fetch Live Real-World Weather from Open-Meteo
+            fetchLiveColomboWeather();
+
+            // Seed initial telemetry feed with 3 recent incidents
+            for (let i = 0; i < 3; i++) {
+                triggerIncidentTick();
+            }
+
+            // Start simulation engine animation loop
+            requestAnimationFrame(simulationLoop);
         });
     </script>
 </body>
