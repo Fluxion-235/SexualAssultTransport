@@ -156,14 +156,25 @@
             color: var(--text-muted);
             margin-bottom: 16px;
         }
-
         .col-12 { grid-column: span 12; }
+        .col-11 { grid-column: span 11; }
+        .col-10 { grid-column: span 10; }
+        .col-9  { grid-column: span 9; }
         .col-8  { grid-column: span 8; }
+        .col-7  { grid-column: span 7; }
         .col-6  { grid-column: span 6; }
+        .col-5  { grid-column: span 5; }
         .col-4  { grid-column: span 4; }
+        .col-3  { grid-column: span 3; }
 
-        @media (max-width: 1024px) {
-            .col-8, .col-6, .col-4 { grid-column: span 12; }
+        .col-12, .col-11, .col-10, .col-9, .col-8, .col-7, .col-6, .col-5, .col-4, .col-3 {
+            min-width: 0;
+        }
+
+        @media (max-width: 1100px) {
+            .col-11, .col-10, .col-9, .col-8, .col-7, .col-6, .col-5, .col-4, .col-3 {
+                grid-column: span 12;
+            }
         }
 
         /* KPI Cards */
@@ -319,173 +330,12 @@
             background: white;
         }
 
-        /* Live Incident Ticker Feed */
-        .incident-feed-container {
-            max-height: 480px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding-right: 6px;
-        }
-
-        .incident-item {
-            background: #FFFFFF;
-            border: 1px solid var(--border);
-            border-left: 5px solid #E53E3E;
-            border-radius: 8px;
-            padding: 12px 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            animation: fadeInSlide 0.3s ease-out;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .incident-item.unreported {
-            border-left-color: #E53E3E;
-        }
-
-        .incident-item.reported {
-            border-left-color: #3182CE;
-            background: #EBF8FF;
-        }
-
-        .incident-item.mitigated {
-            border-left-color: #38A169;
-            background: #F0FFF4;
-        }
-
-        @keyframes fadeInSlide {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .incident-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.82rem;
-        }
-
-        .incident-id-time {
-            font-weight: 800;
-            color: #2D3748;
-        }
-
-        .incident-route-badge {
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            background: #EDF2F7;
-            color: #2D3748;
-        }
-
-        .incident-nature {
-            font-size: 0.92rem;
-            font-weight: 700;
-            color: #9B2C2C;
-        }
-
-        .incident-context {
-            font-size: 0.82rem;
-            color: #4A5568;
-        }
-
-        .incident-outcome {
-            font-size: 0.8rem;
-            font-style: italic;
-            color: #718096;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border-top: 1px dashed var(--border);
-            padding-top: 5px;
-            margin-top: 2px;
-        }
-
-        .incident-cause {
-            font-size: 0.81rem;
-            color: #C05621;
-            background: #FFFAF0;
-            border-left: 3px solid #DD6B20;
-            padding: 5px 9px;
-            border-radius: 4px;
-            font-weight: 500;
-            line-height: 1.35;
-        }
-
-        .incident-cause strong {
-            color: #9C4221;
-            font-weight: 700;
-        }
-
-        .incident-legal {
-            font-size: 0.72rem;
-            color: #4A5568;
-            background: #EDF2F7;
-            padding: 2px 7px;
-            border-radius: 4px;
-            display: inline-block;
-            font-family: monospace;
-            font-weight: 600;
-        }
-
         @keyframes pulseDot {
             0% { transform: scale(0.95); opacity: 0.8; }
             50% { transform: scale(1.3); opacity: 1; }
             100% { transform: scale(0.95); opacity: 0.8; }
         }
 
-        /* Corridor Status Cards Grid */
-        .corridor-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 14px;
-        }
-
-        .corridor-card {
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px 14px;
-            background: #FAFAFA;
-            position: relative;
-            transition: all 0.25s ease;
-        }
-
-        .corridor-card.corridor-alert {
-            background: #FFF5F5;
-            border-color: #E53E3E;
-            box-shadow: 0 0 12px rgba(229, 62, 62, 0.3);
-            transform: scale(1.02);
-        }
-
-        .corridor-name {
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--primary);
-            margin-bottom: 2px;
-        }
-
-        .corridor-meta {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-
-        .corridor-stat-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
 
         /* Interactive controls */
         .control-group {
@@ -727,23 +577,374 @@
         .clock-period-tag { background: #F1EAEE; color: var(--primary); border-radius: 8px; }
         .clock-period-tag.peak { background: var(--danger-bg); color: var(--danger-dark); border-color: #F2C2CB; }
 
-        /* Incident feed */
-        .incident-feed-container { max-height: 620px; }
-        .incident-item { border-radius: 12px; border-left-width: 4px; padding: 14px 16px; }
-        .incident-item.unreported { border-left-color: var(--danger); }
-        .incident-item.reported { border-left-color: #5B5BD6; background: #F4F4FE; }
-        .incident-item.mitigated { border-left-color: var(--success); background: #F1FAF7; }
-        .incident-nature { color: var(--danger-dark); }
-        .incident-route-badge { background: #F1EAEE; color: var(--primary); }
-        .incident-cause { background: #FBF5F0; border-left-color: var(--warning); color: #7A3E12; }
+        /* ================================================================
+           INCIDENT TELEMETRY FEED & CORRIDOR RADAR ENHANCEMENTS
+           ================================================================ */
+        .incident-feed-container {
+            max-height: 640px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 6px;
+        }
 
-        /* Corridor radar */
-        .corridor-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
-        .corridor-card { background: #FCFAF9; border-radius: 12px; }
-        .corridor-card.corridor-alert { background: var(--danger-bg); border-color: var(--danger); box-shadow: 0 0 0 3px rgba(192,38,61,0.15); }
-        .corridor-name { color: var(--ink); }
-        .corridor-bar { height: 4px; background: #EFE7EB; border-radius: 99px; margin-top: 8px; overflow: hidden; }
-        .corridor-bar > span { display: block; height: 100%; background: var(--danger); }
+        .incident-feed-container::-webkit-scrollbar,
+        .corridor-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+        .incident-feed-container::-webkit-scrollbar-track,
+        .corridor-grid::-webkit-scrollbar-track {
+            background: #F1EAEE;
+            border-radius: 4px;
+        }
+        .incident-feed-container::-webkit-scrollbar-thumb,
+        .corridor-grid::-webkit-scrollbar-thumb {
+            background: #D4C3CE;
+            border-radius: 4px;
+        }
+        .incident-feed-container::-webkit-scrollbar-thumb:hover,
+        .corridor-grid::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-accent);
+        }
+
+        .incident-item {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--danger);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            animation: fadeInSlide 0.3s ease-out;
+            box-shadow: 0 2px 6px rgba(45, 27, 61, 0.05);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .incident-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(45, 27, 61, 0.08);
+        }
+        .incident-item.unreported {
+            border-left-color: var(--danger);
+        }
+        .incident-item.reported {
+            border-left-color: #4338CA;
+            background: #F8F9FF;
+        }
+        .incident-item.mitigated {
+            border-left-color: var(--success);
+            background: #F4FBF8;
+        }
+
+        .incident-meta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.78rem;
+        }
+        .meta-left {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .inc-id-tag {
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 800;
+            color: var(--ink);
+            background: #EFE7EB;
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: 0.76rem;
+        }
+        .inc-time-tag {
+            font-family: "JetBrains Mono", monospace;
+            font-weight: 600;
+            color: #6E6470;
+            background: #FAF7F9;
+            border: 1px solid var(--border);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: 0.74rem;
+        }
+        .inc-env-tag {
+            font-weight: 700;
+            font-size: 0.74rem;
+            color: var(--danger-dark);
+            background: var(--danger-bg);
+            padding: 2px 8px;
+            border-radius: 5px;
+            border: 1px solid rgba(192, 38, 61, 0.2);
+        }
+        .inc-route-tag {
+            font-weight: 700;
+            font-size: 0.76rem;
+            color: var(--primary);
+            background: #F1EAEE;
+            padding: 3px 9px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .incident-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+            margin-top: 1px;
+        }
+        .incident-nature-title {
+            font-size: 0.96rem;
+            font-weight: 800;
+            color: var(--danger-dark);
+            line-height: 1.3;
+        }
+        .incident-cat-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #6E6470;
+            background: #FAF7F9;
+            border: 1px solid var(--border);
+            padding: 2px 7px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .incident-narrative {
+            font-size: 0.84rem;
+            color: var(--text-dark);
+            line-height: 1.45;
+        }
+
+        .incident-cause-card {
+            background: #FFFDF9;
+            border: 1px solid #F5E6D8;
+            border-left: 3px solid var(--warning);
+            border-radius: 6px;
+            padding: 8px 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 0.81rem;
+        }
+        .cause-heading {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .cause-label {
+            font-weight: 700;
+            color: #8C4410;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .cause-title {
+            color: #9C4221;
+            font-weight: 800;
+        }
+        .cause-detail {
+            font-size: 0.78rem;
+            color: #5D4A3E;
+            line-height: 1.4;
+        }
+        .cause-tier-badge {
+            align-self: flex-start;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #744210;
+            background: #FEF3C7;
+            padding: 1px 6px;
+            border-radius: 3px;
+            margin-top: 2px;
+        }
+
+        .incident-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-top: 1px dashed var(--border);
+            padding-top: 6px;
+            margin-top: 2px;
+            font-size: 0.78rem;
+        }
+        .incident-legal-chip {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #4A5568;
+            background: #EDF2F7;
+            padding: 2px 7px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .incident-outcome-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            color: #6E6470;
+        }
+        .incident-outcome-chip strong {
+            color: var(--ink);
+        }
+        .incident-outcome-chip.outcome-reported strong {
+            color: #4338CA;
+        }
+        .incident-outcome-chip.outcome-silent strong {
+            color: var(--danger-dark);
+        }
+
+        /* Stream Header Pills */
+        .stream-live-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            color: #065F46;
+            background: #D1FAE5;
+            border: 1px solid #A7F3D0;
+            padding: 3px 8px;
+            border-radius: 99px;
+        }
+        .stream-pulse-dot {
+            width: 7px;
+            height: 7px;
+            background: #10B981;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+            animation: pulseLive 1.8s infinite;
+        }
+        @keyframes pulseLive {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.6; }
+        }
+
+        /* Radar Header Badge */
+        .radar-live-badge {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: #F1EAEE;
+            border: 1px solid #E4CCD8;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        /* Corridor radar cards grid */
+        .corridor-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-height: 640px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        @media (max-width: 650px) {
+            .corridor-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .corridor-card {
+            background: #FCFAF9;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            position: relative;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .corridor-card:hover {
+            border-color: #D4C3CE;
+            box-shadow: 0 2px 8px rgba(45, 27, 61, 0.06);
+        }
+        .corridor-card.corridor-alert {
+            background: var(--danger-bg);
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(192,38,61,0.2);
+            transform: scale(1.02);
+        }
+        .corridor-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+        .corridor-name {
+            color: var(--ink);
+            font-weight: 700;
+            font-size: 0.88rem;
+            line-height: 1.25;
+        }
+        .corridor-risk-pill {
+            font-size: 0.66rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+        .risk-critical { background: #FCE8E6; color: #9B2C2C; border: 1px solid #FEB2B2; }
+        .risk-very-high { background: #FFEDD5; color: #9A3412; border: 1px solid #FDBA74; }
+        .risk-high { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
+        .risk-safe { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+
+        .corridor-meta {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .corridor-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 4px;
+        }
+        .corridor-stat-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .corridor-stat-val {
+            font-family: "Fraunces", Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--danger-dark);
+            line-height: 1;
+        }
+        .corridor-share-val {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: var(--primary-accent);
+        }
+        .corridor-bar {
+            height: 4px;
+            background: #EFE7EB;
+            border-radius: 99px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .corridor-bar > span {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-accent), var(--danger));
+            transition: width 0.3s ease;
+        }
 
         .custom-table th { background: #F3EDEF; color: var(--ink); }
         .badge-extreme { background-color: #FBE1E6; color: var(--danger-dark); }
@@ -962,10 +1163,18 @@
             <!-- Left: Live Incident Stream -->
             <div class="card col-7">
                 <div class="card-title">
-                    <span>📡 Live Incident Telemetry Stream</span>
-                    <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);" id="stream-count-label">Showing recent events</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:1.25rem;">📡</span>
+                        <div>
+                            <span style="font-weight:800; color:var(--ink);">Live Incident Telemetry Stream</span>
+                            <div style="font-size:0.75rem; font-weight:500; color:var(--text-muted); letter-spacing:0.3px;">Real-time stochastic feed simulated from empirical ADB &amp; UNFPA transit data</div>
+                        </div>
+                    </div>
+                    <span class="stream-live-pill">
+                        <span class="stream-pulse-dot"></span>
+                        <span>LIVE FEED</span>
+                    </span>
                 </div>
-                <div class="card-subtitle">Real-time stochastic feed simulated from empirical Asian Development Bank (ADB) & UNFPA transit data</div>
                 
                 <div class="incident-feed-container" id="incident-stream">
                     <!-- Events will dynamically prepend here -->
@@ -975,10 +1184,16 @@
             <!-- Right: Active Corridor Radar & Dynamic Risk Status -->
             <div class="card col-5">
                 <div class="card-title">
-                    <span>🚍 Active Corridor Radar</span>
-                    <span style="font-size: 0.8rem; font-weight: 700; color: #E53E3E;">Real-Time Hits</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:1.25rem;">🚍</span>
+                        <div>
+                            <span style="font-weight:800; color:var(--ink);">Active Corridor Radar</span>
+                            <div style="font-size:0.75rem; font-weight:500; color:var(--text-muted); letter-spacing:0.3px;">Live risk distribution · 10 Western Province transit trunks</div>
+                        </div>
+                    </div>
+                    <span class="radar-live-badge">10 Corridors</span>
                 </div>
-                <div class="card-subtitle">Corridors flash red upon incident detection; metrics update on every tick</div>
+                <div class="card-subtitle">Corridors pulse red upon incident detection; metrics reflect real-time diurnal probability</div>
 
                 <div class="corridor-grid" id="corridor-cards-container">
                     <!-- Corridor status tiles will be dynamically injected -->
@@ -1931,16 +2146,16 @@
 
         // Realistic Corridor Definitions
         const CORRIDORS = [
-            { id: "R138", name: "Route 138 (Homagama ↔ Pettah)", mode: "High Level Trunk", riskWeight: 0.20, baselineIncidents: 0, currentHits: 0, lastLocation: "Nugegoda / Kirulapone" },
-            { id: "R100", name: "Route 100 (Panadura ↔ Pettah)", mode: "Galle Road Coastal", riskWeight: 0.17, baselineIncidents: 0, currentHits: 0, lastLocation: "Moratuwa / Wellawatte" },
-            { id: "R154", name: "Route 154 (Kiribathgoda ↔ Angulana)", mode: "Orbital Student/Hosp", riskWeight: 0.15, baselineIncidents: 0, currentHits: 0, lastLocation: "Borella / Kelaniya Univ" },
-            { id: "R122", name: "Route 122 (Avissawella ↔ Pettah)", mode: "Low Level Semi-Express", riskWeight: 0.11, baselineIncidents: 0, currentHits: 0, lastLocation: "Kaluaggala / Hanwella" },
-            { id: "R120", name: "Route 120 (Horana ↔ Pettah)", mode: "Horana Commuter", riskWeight: 0.09, baselineIncidents: 0, currentHits: 0, lastLocation: "Piliyandala / Bokundara" },
-            { id: "KV_RAIL", name: "Kelani Valley (KV) Commuter Line", mode: "Commuter Rail", riskWeight: 0.09, baselineIncidents: 0, currentHits: 0, lastLocation: "Maharagama Halt Platform" },
-            { id: "COAST_RAIL", name: "Coastal Railway Line", mode: "Commuter Rail", riskWeight: 0.07, baselineIncidents: 0, currentHits: 0, lastLocation: "Dehiwala / Bambalapitiya" },
-            { id: "R177", name: "Route 177 (Kaduwela ↔ Kollupitiya)", mode: "Tech & Campus Trunk", riskWeight: 0.05, baselineIncidents: 0, currentHits: 0, lastLocation: "Battaramulla / SLIIT Hub" },
-            { id: "R240", name: "Route 240 (Negombo ↔ Colombo)", mode: "Northern Arterial", riskWeight: 0.04, baselineIncidents: 0, currentHits: 0, lastLocation: "Wattala / Mabole" },
-            { id: "MMC_EXPRESS", name: "MMC & CM01 Expressway Metrobus", mode: "Mitigated Hub", riskWeight: 0.03, baselineIncidents: 0, currentHits: 0, lastLocation: "Makumbura Terminal Bay 4" }
+            { id: "R138", name: "Route 138 (Homagama ↔ Pettah)", mode: "High Level Trunk", riskWeight: 0.20, baselineIncidents: 0, currentHits: 0, lastLocation: "Nugegoda / Kirulapone", riskScore: "9.2 Critical", riskClass: "risk-critical" },
+            { id: "R100", name: "Route 100 (Panadura ↔ Pettah)", mode: "Galle Road Coastal", riskWeight: 0.17, baselineIncidents: 0, currentHits: 0, lastLocation: "Moratuwa / Wellawatte", riskScore: "9.0 Very High", riskClass: "risk-critical" },
+            { id: "R154", name: "Route 154 (Kiribathgoda ↔ Angulana)", mode: "Orbital Student/Hosp", riskWeight: 0.15, baselineIncidents: 0, currentHits: 0, lastLocation: "Borella / Kelaniya Univ", riskScore: "8.8 High", riskClass: "risk-very-high" },
+            { id: "R122", name: "Route 122 (Avissawella ↔ Pettah)", mode: "Low Level Semi-Express", riskWeight: 0.11, baselineIncidents: 0, currentHits: 0, lastLocation: "Kaluaggala / Hanwella", riskScore: "8.5 High", riskClass: "risk-very-high" },
+            { id: "R120", name: "Route 120 (Horana ↔ Pettah)", mode: "Horana Commuter", riskWeight: 0.09, baselineIncidents: 0, currentHits: 0, lastLocation: "Piliyandala / Bokundara", riskScore: "8.2 High", riskClass: "risk-high" },
+            { id: "KV_RAIL", name: "Kelani Valley (KV) Line", mode: "Commuter Rail", riskWeight: 0.09, baselineIncidents: 0, currentHits: 0, lastLocation: "Maharagama Halt Platform", riskScore: "8.8 Severe", riskClass: "risk-critical" },
+            { id: "COAST_RAIL", name: "Coastal Railway Line", mode: "Commuter Rail", riskWeight: 0.07, baselineIncidents: 0, currentHits: 0, lastLocation: "Dehiwala / Bambalapitiya", riskScore: "8.5 High", riskClass: "risk-high" },
+            { id: "R177", name: "Route 177 (Kaduwela ↔ Kollupitiya)", mode: "Tech & Campus Trunk", riskWeight: 0.05, baselineIncidents: 0, currentHits: 0, lastLocation: "Battaramulla / SLIIT Hub", riskScore: "7.8 Mod-High", riskClass: "risk-high" },
+            { id: "R240", name: "Route 240 (Negombo ↔ Colombo)", mode: "Northern Arterial", riskWeight: 0.04, baselineIncidents: 0, currentHits: 0, lastLocation: "Wattala / Mabole", riskScore: "8.0 High", riskClass: "risk-high" },
+            { id: "MMC_EXPRESS", name: "MMC & CM01 Expressway", mode: "Mitigated Hub", riskWeight: 0.03, baselineIncidents: 0, currentHits: 0, lastLocation: "Makumbura Terminal Bay 4", riskScore: "2.8 Safe", riskClass: "risk-safe" }
         ];
 
         // Probable Situational & Environmental Drivers Library
@@ -2460,11 +2675,20 @@
                 card.className = "corridor-card";
                 card.id = `card-${c.id}`;
                 card.innerHTML = `
-                    <div class="corridor-name">${c.name}</div>
-                    <div class="corridor-meta">${c.mode} · ${c.lastLocation}</div>
+                    <div class="corridor-top-row">
+                        <span class="corridor-name">${c.name}</span>
+                        <span class="corridor-risk-pill ${c.riskClass || 'risk-high'}">${c.riskScore || 'High Risk'}</span>
+                    </div>
+                    <div class="corridor-meta">${c.mode} &bull; ${c.lastLocation}</div>
                     <div class="corridor-stat-row">
-                        <span style="color: var(--text-muted);">Estimated today</span>
-                        <span id="hits-${c.id}" style="color: var(--danger); font-weight: 800;">0</span>
+                        <div>
+                            <div class="corridor-stat-label">Estimated Today</div>
+                            <div class="corridor-stat-val" id="hits-${c.id}">${c.currentHits || 0}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="corridor-stat-label">Risk Share</div>
+                            <div class="corridor-share-val">${(c.riskWeight * 100).toFixed(0)}%</div>
+                        </div>
                     </div>
                     <div class="corridor-bar"><span id="bar-${c.id}" style="width:0%"></span></div>
                 `;
@@ -2481,23 +2705,33 @@
             const incId = `#INC-${String(incNumber).padStart(4, '0')}`;
 
             eventItem.innerHTML = `
-                <div class="incident-header">
-                    <span class="incident-id-time">${incId} • ${timeStr} • <span style="color:#C53030;">${envContext}</span></span>
-                    <span class="incident-route-badge">${corridor.name}</span>
+                <div class="incident-meta-bar">
+                    <div class="meta-left">
+                        <span class="inc-id-tag">${incId}</span>
+                        <span class="inc-time-tag">🕒 ${timeStr}</span>
+                        <span class="inc-env-tag">${envContext}</span>
+                    </div>
+                    <span class="inc-route-tag">🚍 ${corridor.name}</span>
                 </div>
-                <div class="incident-nature">⚠️ ${incType.type}</div>
-                <div class="incident-cause">
-                    <strong>🔍 Probable Reason:</strong> ${causeObj.cause}
-                    <div style="font-size:0.77rem; color:#744210; margin-top:2px;"><em>${causeObj.detail}</em> [${causeObj.riskTier}]</div>
+                <div class="incident-title-row">
+                    <div class="incident-nature-title">⚠️ ${incType.type}</div>
+                    <span class="incident-cat-badge">${incType.category}</span>
                 </div>
-                <div class="incident-context">${incType.desc} near ${corridor.lastLocation}.</div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
-                    <span class="incident-legal">⚖️ ${incType.penalCode}</span>
-                    <span style="font-size:0.75rem; color:#718096; font-weight:600;">Category: ${incType.category}</span>
+                <div class="incident-narrative">${incType.desc} near <strong>${corridor.lastLocation}</strong>.</div>
+                <div class="incident-cause-card">
+                    <div class="cause-heading">
+                        <span class="cause-label">🔍 Structural Catalyst:</span>
+                        <strong class="cause-title">${causeObj.cause}</strong>
+                    </div>
+                    <div class="cause-detail">${causeObj.detail}</div>
+                    <div class="cause-tier-badge">${causeObj.riskTier}</div>
                 </div>
-                <div class="incident-outcome">
-                    <span>${outcome.icon}</span>
-                    <span><strong>Commuter Reaction:</strong> ${outcome.label} — ${outcome.desc}</span>
+                <div class="incident-footer-row">
+                    <div class="incident-legal-chip">⚖️ ${incType.penalCode}</div>
+                    <div class="incident-outcome-chip ${isReported ? 'outcome-reported' : 'outcome-silent'}">
+                        <span>${outcome.icon}</span>
+                        <span><strong>${outcome.label}</strong> — ${outcome.desc}</span>
+                    </div>
                 </div>
             `;
             return eventItem;
